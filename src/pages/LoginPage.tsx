@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight, Eye, EyeOff, Lock, User as UserIcon } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { toast } from '@/lib/toast'
 import { cn } from '@/lib/cn'
 
 type Tab = 'client' | 'admin'
@@ -187,6 +188,12 @@ export function LoginPage() {
                 </label>
                 <button
                   type="button"
+                  onClick={() =>
+                    toast.info('Funcionalidade em desenvolvimento', {
+                      description:
+                        'Em breve você poderá recuperar sua senha por email.',
+                    })
+                  }
                   className="text-xs font-semibold tracking-[0.6px] text-[var(--color-violet-soft)] hover:underline"
                 >
                   Esqueceu a Senha?
@@ -250,7 +257,16 @@ export function LoginPage() {
           <div className="mt-12 flex flex-col gap-4 border-t border-[var(--color-border-subtle)] pt-8">
             <p className="text-center text-base text-[var(--color-foreground-faint)]">
               Não tem uma conta?{' '}
-              <button type="button" className="font-medium text-[var(--color-foreground)] hover:underline">
+              <button
+                type="button"
+                onClick={() =>
+                  toast.info('Funcionalidade em desenvolvimento', {
+                    description:
+                      'Em breve será possível solicitar acesso à plataforma NOIR_LUXE.',
+                  })
+                }
+                className="font-medium text-[var(--color-foreground)] hover:underline"
+              >
                 Solicitar Acesso
               </button>
             </p>

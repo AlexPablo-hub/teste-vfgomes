@@ -1,0 +1,11 @@
+{
+  "// Tailwind CSS IntelliSense — silenciar hints estilísticas": "",
+  "// As classes arbitrárias (ex: max-w-[1536px], pl-[49px]) são funcionalmente": "",
+  "// idênticas às canônicas (max-w-384, pl-12.25). Mantemos as arbitrárias": "",
+  "// porque foram extraídas pixel-perfect dos designs do Figma.": "",
+  "tailwindCSS.lint.suggestCanonicalClasses": "ignore",
+  "tailwindCSS.experimental.classRegex": [],
+  "css.validate": true,
+  "scss.validate": true,
+  "less.validate": true
+}

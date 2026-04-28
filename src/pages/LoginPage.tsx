@@ -80,7 +80,7 @@ export function LoginPage() {
       {/* HERO — esquerda */}
       <aside className="relative hidden flex-1 items-end overflow-hidden lg:flex">
         <img
-          src="/images/login-hero.jpg"
+          src="/images/Image_b5jtkjb5jtkjb5jt.png"
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"
@@ -98,13 +98,12 @@ export function LoginPage() {
             NOIR LUXE
           </h1>
           <p className="max-w-[448px] text-[18px] leading-[28.8px] text-[#cbd5e1]">
-            O destino definitivo para tecnologia premium curada
-            <br />e itens essenciais de estilo de vida sofisticado.
+            A seleção definitiva para quem exige o extraordinário.
           </p>
           <div className="mt-4 flex items-center gap-4">
             <span aria-hidden className="h-0.5 w-12 bg-[#7c3aed]" />
             <span className="text-xs font-semibold uppercase tracking-[1.2px] text-[#94a3b8]">
-              EST. 2024
+              EST. 2026
             </span>
           </div>
         </div>

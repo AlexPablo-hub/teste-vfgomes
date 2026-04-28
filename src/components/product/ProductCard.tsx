@@ -30,7 +30,7 @@ export function ProductCard({ product, badge }: ProductCardProps) {
     (categoryLabels as Record<string, string>)[product.category as CategorySlug] ?? product.category
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[rgba(15,23,42,0.8)] backdrop-blur-[10px] transition-all hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-black/40 animate-fade-in">
+    <article className="group relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[rgba(15,23,42,0.8)] backdrop-blur-[10px] transition-all hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-black/40">
       <Link
         to={`/products/${product.id}`}
         className="relative block h-[285px] w-full overflow-hidden"

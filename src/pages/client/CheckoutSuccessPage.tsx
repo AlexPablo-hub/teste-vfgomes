@@ -1,7 +1,9 @@
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { CheckCircle2, Printer, ShoppingBag } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { formatBRL } from '@/lib/format'
 import type { CartItem } from '@/types/cart'
+import { easeLuxe, fadeIn, scaleIn, slideUp, staggerContainer, staggerItem } from '@/lib/motion'
 
 interface SuccessState {
   orderId: string
@@ -23,16 +25,43 @@ export function CheckoutSuccessPage() {
   return (
     <div className="min-h-screen bg-[var(--color-background)] py-12">
       {/* Header simplificado — apenas wordmark centralizado */}
-      <div className="mb-10 text-center">
+      <motion.div
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        className="mb-10 text-center"
+      >
         <span className="brand-wordmark text-2xl font-semibold">NOIR · LUXE</span>
-      </div>
+      </motion.div>
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         {/* Bloco principal */}
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 text-center animate-scale-in">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[var(--color-primary)]/15 ring-8 ring-[var(--color-primary)]/5">
+        <motion.div
+          variants={scaleIn}
+          initial="hidden"
+          animate="visible"
+          className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 text-center"
+        >
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{
+              scale: 1,
+              rotate: 0,
+              boxShadow: [
+                '0 0 0 0 rgba(124,58,237,0.55)',
+                '0 0 0 20px rgba(124,58,237,0)',
+                '0 0 0 0 rgba(124,58,237,0)',
+              ],
+            }}
+            transition={{
+              scale: { delay: 0.6, duration: 1.0, ease: easeLuxe },
+              rotate: { delay: 0.6, duration: 1.0, ease: easeLuxe },
+              boxShadow: { delay: 1.6, duration: 2.0, repeat: 1 },
+            }}
+            className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[var(--color-primary)]/15 ring-8 ring-[var(--color-primary)]/5"
+          >
             <CheckCircle2 className="h-8 w-8 text-[var(--color-primary)]" />
-          </div>
+          </motion.div>
           <h1 className="mt-5 text-3xl font-bold sm:text-4xl">Pedido realizado com sucesso!</h1>
           <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
             Obrigado por escolher a NOIR_LUXE. Sua curadoria está sendo processada.
@@ -48,15 +77,31 @@ export function CheckoutSuccessPage() {
               <p className="mt-1 font-bold">{state.estimatedDelivery}</p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Resumo */}
-        <div className="mt-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 animate-fade-in">
+        <motion.div
+          variants={slideUp}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.3 }}
+          className="mt-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8"
+        >
           <h2 className="text-2xl font-semibold">Resumo do Pedido</h2>
 
-          <ul className="mt-6 divide-y divide-[var(--color-border)]">
+          <motion.ul
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            transition={{ delayChildren: 0.5 }}
+            className="mt-6 divide-y divide-[var(--color-border)]"
+          >
             {state.items.map((item) => (
-              <li key={item.product.id} className="flex items-center gap-4 py-4">
+              <motion.li
+                key={item.product.id}
+                variants={staggerItem}
+                className="flex items-center gap-4 py-4"
+              >
                 <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-lg bg-white/5">
                   <img
                     src={item.product.image}
@@ -74,9 +119,9 @@ export function CheckoutSuccessPage() {
                   <p className="font-semibold">{formatBRL(item.product.price * item.quantity)}</p>
                   <p className="text-xs text-[var(--color-muted-foreground)]">Qtd: {item.quantity}</p>
                 </div>
-              </li>
+              </motion.li>
             ))}
-          </ul>
+          </motion.ul>
 
           <dl className="mt-4 space-y-2 border-t border-[var(--color-border)] pt-4 text-sm">
             <div className="flex justify-between">
@@ -92,10 +137,16 @@ export function CheckoutSuccessPage() {
               <dd className="text-2xl font-bold text-[var(--color-primary)]">{formatBRL(state.total)}</dd>
             </div>
           </dl>
-        </div>
+        </motion.div>
 
         {/* Ações */}
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <motion.div
+          variants={slideUp}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.6 }}
+          className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2"
+        >
           <Link
             to="/products"
             replace
@@ -110,7 +161,7 @@ export function CheckoutSuccessPage() {
           >
             <Printer className="h-4 w-4" /> Imprimir Comprovante
           </button>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

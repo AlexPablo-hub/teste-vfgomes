@@ -10,6 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { fadeIn, slideUp, easeLuxe } from '@/lib/motion'
 import { useProductsStore } from '@/stores/productsStore'
 import { categoryLabels, productCategories } from '@/data/mocks'
 import {
@@ -124,9 +126,19 @@ export function AdminProductsPage() {
   }
 
   return (
-    <div className="px-8 pb-12 pt-8">
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="px-8 pb-12 pt-8"
+    >
       {/* Cabeçalho da seção */}
-      <div className="flex items-end justify-between gap-4 pb-8">
+      <motion.div
+        variants={slideUp}
+        initial="hidden"
+        animate="visible"
+        className="flex items-end justify-between gap-4 pb-8"
+      >
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-semibold leading-9 tracking-[-0.3px] text-white">
             Gestão de estoque
@@ -146,10 +158,14 @@ export function AdminProductsPage() {
           <Plus className="h-3.5 w-3.5" />
           Adicionar Produto
         </button>
-      </div>
+      </motion.div>
 
       {/* Card com tabela */}
-      <div
+      <motion.div
+        variants={slideUp}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.15 }}
         className="overflow-hidden rounded-xl border border-white/10 bg-[rgba(15,23,42,0.8)] backdrop-blur-[10px]"
         style={{ boxShadow: '0px 25px 50px -12px rgba(0,0,0,0.4)' }}
       >
@@ -235,8 +251,11 @@ export function AdminProductsPage() {
                 paged.map((p, i) => {
                   const status = stockStatus(p)
                   return (
-                    <tr
+                    <motion.tr
                       key={p.id}
+                      initial={{ opacity: 0, x: -24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 + i * 0.12, duration: 0.8, ease: easeLuxe }}
                       className={cn(
                         'transition-colors hover:bg-white/[0.02]',
                         i > 0 && 'border-t border-white/5',
@@ -291,7 +310,7 @@ export function AdminProductsPage() {
                           </button>
                         </div>
                       </td>
-                    </tr>
+                    </motion.tr>
                   )
                 })
               )}
@@ -330,7 +349,7 @@ export function AdminProductsPage() {
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
 
       <Modal
         open={modalOpen}
@@ -430,7 +449,7 @@ export function AdminProductsPage() {
         destructive
         confirmLabel="Excluir"
       />
-    </div>
+    </motion.div>
   )
 }
 

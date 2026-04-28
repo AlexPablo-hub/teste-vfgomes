@@ -1,11 +1,13 @@
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { ShoppingBag, LogOut, User as UserIcon, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { useCartStore } from '@/stores/cartStore'
 import { Button } from '@/components/ui/Button'
 import { CartDrawer } from '@/components/cart/CartDrawer'
 import { cn } from '@/lib/cn'
+import { slideDown } from '@/lib/motion'
 
 const sections = [
   { to: '/products', label: 'Novidades' },
@@ -45,7 +47,10 @@ export function Header() {
 
   return (
     <>
-      <header
+      <motion.header
+        variants={slideDown}
+        initial="hidden"
+        animate="visible"
         className="sticky top-0 z-30 h-20 border-b border-white/10 bg-[rgba(2,6,23,0.8)] backdrop-blur-[12px]"
         style={{ boxShadow: '0px 25px 50px -12px rgba(0,0,0,0.4)' }}
       >
@@ -165,7 +170,7 @@ export function Header() {
             </div>
           </div>
         )}
-      </header>
+      </motion.header>
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>

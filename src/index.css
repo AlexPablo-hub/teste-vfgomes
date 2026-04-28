@@ -112,24 +112,45 @@
     font-weight: 500;
   }
 
+  /* ========================================================================
+   * KEYFRAMES — primitivos de animação
+   * Easing padrão: cubic-bezier(0.16, 1, 0.3, 1) — "luxury ease-out",
+   * decai suave ao final (sem overshoot, alinhado ao tom NOIR_LUXE).
+   * ======================================================================== */
+
   @keyframes fade-in {
-    from { opacity: 0; transform: translateY(4px); }
+    from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes scale-in {
-    from { opacity: 0; transform: scale(0.96); }
+    from { opacity: 0; transform: scale(0.92); }
     to   { opacity: 1; transform: scale(1); }
   }
 
   @keyframes slide-up {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-down {
+    from { opacity: 0; transform: translateY(-40px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes slide-in-right {
     from { transform: translateX(100%); }
     to   { transform: translateX(0); }
+  }
+
+  @keyframes slide-in-left {
+    from { opacity: 0; transform: translateX(-60px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes zoom-in {
+    from { opacity: 0; transform: scale(1.08); }
+    to   { opacity: 1; transform: scale(1); }
   }
 
   @keyframes shimmer {
@@ -142,10 +163,29 @@
     to   { width: 0%; }
   }
 
-  .animate-fade-in       { animation: fade-in 250ms ease-out both; }
-  .animate-scale-in      { animation: scale-in 200ms ease-out both; }
-  .animate-slide-up      { animation: slide-up 300ms ease-out both; }
-  .animate-slide-in-right{ animation: slide-in-right 280ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.55); }
+    50%      { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+  }
+
+  /* ========================================================================
+   * UTILITIES — apply-once com 'both' para preservar estado final.
+   * ======================================================================== */
+
+  .animate-fade-in        { animation: fade-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-scale-in       { animation: scale-in 600ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-slide-up       { animation: slide-up 800ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-slide-down     { animation: slide-down 700ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-slide-in-right { animation: slide-in-right 500ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-slide-in-left  { animation: slide-in-left 800ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-zoom-in        { animation: zoom-in 900ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-pulse-glow     { animation: pulse-glow 1.6s ease-out 2; }
+
+  /* ========================================================================
+   * SKELETONS & DECORATIVOS
+   * (Animações coreografadas vivem no JS via Framer Motion.
+   *  Estas aqui são CSS-only por necessidade de performance/simplicidade.)
+   * ======================================================================== */
 
   .skeleton {
     background: linear-gradient(
@@ -165,3 +205,28 @@
     border: 1px solid var(--color-border);
   }
 }
+
+/* ==========================================================================
+ * ACESSIBILIDADE — respeita prefers-reduced-motion (requisito do README:
+ * "Acessibilidade básica"). Quando o usuário tem 'Reduzir movimento'
+ * ativo no SO, todas as animações ficam quase instantâneas e elementos
+ * com 'reveal' aparecem direto (sem fade/transform).
+ * ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .skeleton {
+    animation: none;
+    background: var(--color-muted);
+  }
+}
+
+/* Framer Motion respeita prefers-reduced-motion via useReducedMotion() onde
+ * aplicável. As páginas usam motion components diretamente — sem CSS-side
+ * stagger/reveal — para animações coreografadas e em-viewport. */

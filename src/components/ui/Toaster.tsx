@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle, CheckCircle2, Info, X, XCircle, type LucideIcon } from 'lucide-react'
 import { useToastStore, type Toast, type ToastVariant } from '@/stores/toastStore'
 
 interface VariantConfig {
   icon: LucideIcon
-  /** Cor de destaque (border lateral, ícone). */
+  /** Cor de destaque (border lateral, ícone, barra de progresso). */
   accent: string
   /** Background do "selo" do ícone (com leve transparência). */
   iconBg: string
@@ -45,9 +46,11 @@ export function Toaster() {
       aria-label="Notificações"
       className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-full max-w-sm flex-col gap-3 sm:bottom-6 sm:right-6"
     >
-      {toasts.map((t) => (
-        <ToastItem key={t.id} toast={t} />
-      ))}
+      <AnimatePresence initial={true}>
+        {toasts.map((t) => (
+          <ToastItem key={t.id} toast={t} />
+        ))}
+      </AnimatePresence>
     </div>,
     document.body,
   )
@@ -62,18 +65,22 @@ function ToastItem({ toast }: ToastItemProps) {
   const config = variantConfig[toast.variant]
   const Icon = config.icon
 
-  // Pausa só a animação visual da barra de progresso enquanto o usuário hover.
-  // O timer real do auto-dismiss vive no toastStore (não pausa por hover —
-  // simplificação consciente; pode ser estendido depois).
+  // Pausa a barra de progresso enquanto o usuário hover (animação visual).
+  // O timer real do auto-dismiss vive no toastStore.
   const [paused, setPaused] = useState(false)
 
   return (
-    <div
+    <motion.div
+      layout
       role="status"
       aria-live={toast.variant === 'error' ? 'assertive' : 'polite'}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="pointer-events-auto group relative flex w-full gap-3 overflow-hidden rounded-xl border bg-[rgba(15,23,42,0.95)] p-4 shadow-2xl backdrop-blur-md animate-slide-in-right"
+      initial={{ opacity: 0, x: 80, scale: 0.95 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 80, scale: 0.95, transition: { duration: 0.25 } }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      className="pointer-events-auto group relative flex w-full gap-3 overflow-hidden rounded-xl border bg-[rgba(15,23,42,0.95)] p-4 pb-5 shadow-2xl backdrop-blur-md"
       style={{
         borderColor: `${config.accent}33`,
         borderLeftWidth: 3,
@@ -109,18 +116,17 @@ function ToastItem({ toast }: ToastItemProps) {
         <X className="h-3.5 w-3.5" />
       </button>
 
-      {/* Barra de progresso (auto-dismiss) */}
+      {/* Barra de progresso — anima width de 100% → 0% durante a duração */}
       {toast.duration > 0 && (
-        <div
+        <motion.div
           aria-hidden
-          className="absolute bottom-0 left-0 h-0.5"
-          style={{
-            backgroundColor: config.accent,
-            animation: `toast-progress ${toast.duration}ms linear forwards`,
-            animationPlayState: paused ? 'paused' : 'running',
-          }}
+          className="absolute bottom-0 left-0 h-1"
+          style={{ backgroundColor: config.accent }}
+          initial={{ width: '100%' }}
+          animate={{ width: paused ? undefined : '0%' }}
+          transition={{ duration: toast.duration / 1000, ease: 'linear' }}
         />
       )}
-    </div>
+    </motion.div>
   )
 }

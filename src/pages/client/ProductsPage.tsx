@@ -1,11 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AlertCircle, ChevronDown, SearchX } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ProductCard, ProductCardSkeleton } from '@/components/product/ProductCard'
 import { useProductsStore } from '@/stores/productsStore'
 import { categoryLabels, productCategories } from '@/data/mocks'
 import { cn } from '@/lib/cn'
+import {
+  fadeIn,
+  slideInLeft,
+  slideUp,
+  staggerContainerSlow,
+  staggerItem,
+} from '@/lib/motion'
 
 type SortBy = 'relevance' | 'price-asc' | 'price-desc' | 'rating'
 
@@ -35,7 +43,7 @@ export function ProductsPage() {
 
   useEffect(() => {
     setLoading(true)
-    const t = window.setTimeout(() => setLoading(false), 600)
+    const t = window.setTimeout(() => setLoading(false), 1200)
     return () => window.clearTimeout(t)
   }, [])
 
@@ -88,10 +96,20 @@ export function ProductsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1536px] px-8 py-20">
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="mx-auto max-w-[1536px] px-8 py-20"
+    >
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[256px_1fr]">
         {/* SIDEBAR */}
-        <aside className="hidden pt-8 lg:block">
+        <motion.aside
+          variants={slideInLeft}
+          initial="hidden"
+          animate="visible"
+          className="hidden pt-8 lg:block"
+        >
           <div className="flex flex-col gap-8">
             {/* CATEGORIAS */}
             <section className="flex flex-col gap-4">
@@ -171,11 +189,16 @@ export function ProductsPage() {
               </div>
             </section>
           </div>
-        </aside>
+        </motion.aside>
 
         {/* MAIN GRID */}
         <section className="flex flex-col gap-8 pt-8">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+          <motion.div
+            variants={slideUp}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end"
+          >
             <div className="flex flex-col gap-2">
               <h1 className="text-3xl font-semibold leading-9 tracking-[-0.3px] text-white">Novidades</h1>
               <p className="text-base leading-6 text-[#94a3b8]">
@@ -220,15 +243,22 @@ export function ProductsPage() {
                 </>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Grid */}
           {loading ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <motion.div
+              variants={staggerContainerSlow}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
               {Array.from({ length: 8 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
+                <motion.div key={i} variants={staggerItem}>
+                  <ProductCardSkeleton />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : filtered.length === 0 ? (
             <EmptyState
               icon={<SearchX className="h-6 w-6" />}
@@ -248,11 +278,18 @@ export function ProductsPage() {
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <motion.div
+                variants={staggerContainerSlow}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              >
                 {filtered.map((p) => (
-                  <ProductCard key={p.id} product={p} badge={productBadges[p.id]} />
+                  <motion.div key={p.id} variants={staggerItem}>
+                    <ProductCard product={p} badge={productBadges[p.id]} />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
               {/* Load More */}
               <div className="flex flex-col items-center gap-6 pt-12">
@@ -270,7 +307,7 @@ export function ProductsPage() {
           )}
         </section>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

@@ -1,11 +1,19 @@
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { Heart, ShoppingCart, Check } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useProductsStore } from '@/stores/productsStore'
 import { useCartStore } from '@/stores/cartStore'
 import { formatBRL } from '@/lib/format'
 import { formatSku } from '@/types/product'
 import { cn } from '@/lib/cn'
+import {
+  inViewport,
+  revealUp,
+  staggerContainer,
+  staggerItem,
+  zoomIn,
+} from '@/lib/motion'
 
 const sizes = [38, 40, 42, 44]
 
@@ -52,7 +60,12 @@ export function ProductDetailPage() {
       {/* Hero Section */}
       <section className="grid grid-cols-1 gap-12 lg:grid-cols-[700px_1fr]">
         {/* Imagem principal + thumbnails */}
-        <div className="flex flex-col gap-4">
+        <motion.div
+          variants={zoomIn}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col gap-4"
+        >
           <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[rgba(25,31,49,0.8)] backdrop-blur-[10px]">
             <div className="aspect-[700/874] w-full">
               <img
@@ -82,11 +95,16 @@ export function ProductDetailPage() {
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Detalhes */}
-        <div className="flex flex-col">
-          <div className="flex flex-col gap-2">
+        {/* Detalhes — stagger via Framer Motion */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col"
+        >
+          <motion.div variants={staggerItem} className="flex flex-col gap-2">
             <span className="text-base uppercase tracking-[1.6px] text-[#a78bfa]">EDIÇÃO LIMITADA</span>
             <h1 className="text-5xl font-normal uppercase leading-[48px] text-[#dce1fb]">
               {titleLines[0]}
@@ -102,12 +120,17 @@ export function ProductDetailPage() {
                 </span>
               )}
             </div>
-          </div>
+          </motion.div>
 
-          <p className="mt-8 text-base leading-6 text-[#94a3b8]">{product.description}</p>
+          <motion.p
+            variants={staggerItem}
+            className="mt-8 text-base leading-6 text-[#94a3b8]"
+          >
+            {product.description}
+          </motion.p>
 
           {/* Tamanhos */}
-          <div className="mt-8 flex flex-col">
+          <motion.div variants={staggerItem} className="mt-8 flex flex-col">
             <div className="flex items-center justify-between">
               <span className="text-base text-[#cbd5e1]">Selecionar Tamanho</span>
               <button type="button" className="text-base text-[#a78bfa] hover:underline">
@@ -132,10 +155,10 @@ export function ProductDetailPage() {
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* CTA */}
-          <div className="mt-8 flex flex-col gap-4 pt-4">
+          <motion.div variants={staggerItem} className="mt-8 flex flex-col gap-4 pt-4">
             <button
               type="button"
               onClick={handleAdd}
@@ -170,12 +193,18 @@ export function ProductDetailPage() {
             <p className="text-center text-base tracking-[0.8px] text-[#64748b]">
               SKU: {formatSku(product)}
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Especificações Técnicas */}
-      <section className="flex flex-col gap-8">
+      <motion.section
+        variants={revealUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={inViewport}
+        className="flex flex-col gap-8"
+      >
         <h2 className="text-base text-white">Especificações Técnicas</h2>
         <div className="overflow-hidden rounded-xl border border-white/10 bg-[rgba(25,31,49,0.8)] backdrop-blur-[10px]">
           <table className="w-full text-left">
@@ -199,22 +228,36 @@ export function ProductDetailPage() {
             </tbody>
           </table>
         </div>
-      </section>
+      </motion.section>
 
       {/* Complete o Look */}
-      <section className="flex flex-col gap-8">
+      <motion.section
+        variants={revealUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={inViewport}
+        className="flex flex-col gap-8"
+      >
         <div className="flex items-end justify-between">
           <h2 className="text-base text-white">Complete o Look</h2>
           <Link to="/products" className="text-base text-[#a78bfa] hover:underline">
             Ver Boutique
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={inViewport}
+          className="grid grid-cols-2 gap-6 lg:grid-cols-4"
+        >
           {related.map((p) => (
-            <RelatedCard key={p.id} product={p} />
+            <motion.div key={p.id} variants={staggerItem}>
+              <RelatedCard product={p} />
+            </motion.div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
     </div>
   )
 }

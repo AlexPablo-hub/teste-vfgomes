@@ -2,9 +2,11 @@ import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { Lock, Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useCartStore } from '@/stores/cartStore'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { formatBRL } from '@/lib/format'
+import { easeLuxe } from '@/lib/motion'
 
 interface CartDrawerProps {
   open: boolean
@@ -89,11 +91,17 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         ) : (
           <>
             <ul className="flex-1 overflow-y-auto px-8 py-6">
-              {items.map((item) => (
-                <li
-                  key={item.product.id}
-                  className="mb-6 flex gap-4 last:mb-0 animate-fade-in"
-                >
+              <AnimatePresence initial={true}>
+                {items.map((item, i) => (
+                  <motion.li
+                    key={item.product.id}
+                    layout
+                    initial={{ opacity: 0, x: 40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 40, height: 0, marginBottom: 0 }}
+                    transition={{ delay: i * 0.15, duration: 0.8, ease: easeLuxe }}
+                    className="mb-6 flex gap-4 last:mb-0"
+                  >
                   <div className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-lg border border-white/5 bg-[#2e3447]">
                     <img
                       src={item.product.image}
@@ -150,8 +158,9 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       </span>
                     </div>
                   </div>
-                </li>
-              ))}
+                  </motion.li>
+                ))}
+              </AnimatePresence>
             </ul>
 
             {/* Footer / Totals */}

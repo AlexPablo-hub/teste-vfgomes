@@ -10,9 +10,11 @@ import {
   Menu,
   X,
 } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
+import { slideInLeft, slideDown } from '@/lib/motion'
 
 interface NavItem {
   to: string
@@ -115,12 +117,15 @@ export function AdminLayout() {
   return (
     <div className="flex min-h-screen bg-[#0c1324]">
       {/* Sidebar desktop */}
-      <aside
+      <motion.aside
+        variants={slideInLeft}
+        initial="hidden"
+        animate="visible"
         className="hidden w-64 shrink-0 border-r border-white/10 bg-[rgba(15,23,42,0.9)] backdrop-blur-[8px] lg:block"
         style={{ boxShadow: '4px 0px 24px 0px rgba(0,0,0,0.5)' }}
       >
         {sidebarContent}
-      </aside>
+      </motion.aside>
 
       {/* Sidebar mobile */}
       {mobileOpen && (
@@ -140,7 +145,12 @@ export function AdminLayout() {
       {/* Conteúdo */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Top header com breadcrumb + profile */}
-        <header className="sticky top-0 z-20 flex h-12 items-center justify-between gap-3 border-b border-white/10 bg-[rgba(2,6,23,0.8)] px-8 backdrop-blur-[12px]">
+        <motion.header
+          variants={slideDown}
+          initial="hidden"
+          animate="visible"
+          className="sticky top-0 z-20 flex h-12 items-center justify-between gap-3 border-b border-white/10 bg-[rgba(2,6,23,0.8)] px-8 backdrop-blur-[12px]"
+        >
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -189,7 +199,7 @@ export function AdminLayout() {
               </span>
             </div>
           </div>
-        </header>
+        </motion.header>
 
         <main className="flex-1">
           <Outlet />

@@ -2,9 +2,14 @@ import type { Product } from '@/types/product'
 import type { User } from '@/types/user'
 
 /**
- * Catálogo NOIR_LUXE — produtos curados conforme identidade do Figma.
- * Categorias usam slug PT-BR (não as da Fakestore API). A integração futura com a API
- * mapeia para os slugs originais (electronics/men's clothing/etc) numa camada de adaptação.
+ * Catálogo NOIR_LUXE — produtos mockados para fallback offline e seeds.
+ *
+ * As categorias usam exatamente os slugs da Fakestore API
+ * (electronics, jewelery, men's clothing, women's clothing) para que a
+ * integração com a API real funcione sem camada de tradução.
+ *
+ * O mapa `categoryLabels` traduz os slugs para os labels visuais NOIR_LUXE
+ * que aparecem na UI (Relógios / Fragrâncias / Casacos / Calçados).
  */
 export const mockProducts: Product[] = [
   {
@@ -13,7 +18,7 @@ export const mockProducts: Product[] = [
     price: 2450,
     description:
       'Sobretudo de lã virgem em tom obsidiana. Corte alfaiataria, forro acetinado, fechamento com botões de chifre.',
-    category: 'casacos',
+    category: "men's clothing",
     image: '/images/coat.jpg',
     rating: { rate: 4.8, count: 92 },
     sku: 'NL-COA-1043',
@@ -25,7 +30,7 @@ export const mockProducts: Product[] = [
     price: 8900,
     description:
       'Cronógrafo automático em aço com calibre suíço. Mostrador noir, ponteiros luminescentes, vidro safira anti-reflexo.',
-    category: 'relogios',
+    category: 'electronics',
     image: '/images/watch-midnight.jpg',
     rating: { rate: 4.9, count: 174 },
     sku: 'NL-8829',
@@ -37,7 +42,7 @@ export const mockProducts: Product[] = [
     price: 1290,
     description:
       'Scarpins em seda natural com bico fino. Salto 9cm forrado em couro italiano. Edição limitada.',
-    category: 'calcados',
+    category: "women's clothing",
     image: '/images/shoe-pump.jpg',
     rating: { rate: 4.6, count: 88 },
     sku: 'NL-2210',
@@ -49,7 +54,7 @@ export const mockProducts: Product[] = [
     price: 450,
     description:
       'Fragrância oriental com notas de bergamota, oud e baunilha bourbon. 100ml em frasco esculpido. Produzida em Grasse, França.',
-    category: 'fragrancias',
+    category: 'jewelery',
     image: '/images/fragrance.jpg',
     rating: { rate: 4.7, count: 213 },
     sku: 'NL-7702',
@@ -61,7 +66,7 @@ export const mockProducts: Product[] = [
     price: 2490,
     description:
       'O ápice da precisão arquitetônica e materiais de alto desempenho. O Obsidian X1 apresenta couro de bezerro italiano tratado à mão, suporte integrado de fibra de carbono e uma entressola de dupla densidade para um luxo sem esforço a cada passo.',
-    category: 'calcados',
+    category: "men's clothing",
     image: '/images/boot-obsidian.jpg',
     rating: { rate: 4.9, count: 156 },
     sku: 'NL-OBS-2024-X1',
@@ -73,7 +78,7 @@ export const mockProducts: Product[] = [
     price: 4800,
     description:
       'Cronógrafo de edição limitada com case em carbono forjado. Pulseira em couro Barenia. 200 unidades numeradas mundialmente.',
-    category: 'relogios',
+    category: 'electronics',
     image: '/images/watch-eclipse.jpg',
     rating: { rate: 4.8, count: 67 },
     sku: 'NL-5512',
@@ -85,7 +90,7 @@ export const mockProducts: Product[] = [
     price: 890,
     description:
       'Pasta executiva em couro italiano vegetal. Compartimento para notebook 15", divisórias internas em camurça.',
-    category: 'boutique',
+    category: 'jewelery',
     image: '/images/satchel.jpg',
     rating: { rate: 4.5, count: 121 },
     sku: 'NL-1102',
@@ -97,7 +102,7 @@ export const mockProducts: Product[] = [
     price: 450,
     description:
       'Tênis de performance em malha 3D com entressola em espuma de carbono. Cabedal sem costuras.',
-    category: 'calcados',
+    category: "men's clothing",
     image: '/images/sneaker.jpg',
     rating: { rate: 4.4, count: 304 },
     sku: 'NL-4412',
@@ -109,7 +114,7 @@ export const mockProducts: Product[] = [
     price: 590,
     description:
       'Cinto em couro full-grain envelhecido naturalmente. Fivela em aço escovado com gravação NOIR_LUXE.',
-    category: 'boutique',
+    category: "men's clothing",
     image: '/images/belt.jpg',
     rating: { rate: 4.6, count: 45 },
     sku: 'NL-ACC-04',
@@ -121,7 +126,7 @@ export const mockProducts: Product[] = [
     price: 1890,
     description:
       'Cronógrafo com mostrador efeito lunar e fases da lua mecânicas. Caixa em titânio escovado, pulseira em couro Barenia preto.',
-    category: 'relogios',
+    category: 'electronics',
     image: '/images/watch-lunar.jpg',
     rating: { rate: 4.7, count: 89 },
     sku: 'NL-WAT-22',
@@ -133,7 +138,7 @@ export const mockProducts: Product[] = [
     price: 1250,
     description:
       'Mochila executiva em couro italiano. Compartimento isolado para notebook, organização modular interna, alças anatômicas.',
-    category: 'boutique',
+    category: 'jewelery',
     image: '/images/backpack.jpg',
     rating: { rate: 4.7, count: 132 },
     sku: 'NL-BAG-09',
@@ -145,7 +150,7 @@ export const mockProducts: Product[] = [
     price: 2490,
     description:
       'Tênis premium feito à mão com cabedal em couro italiano e entressola de carbono. Solado vibram especial.',
-    category: 'calcados',
+    category: "men's clothing",
     image: '/images/sneaker.jpg',
     rating: { rate: 4.8, count: 178 },
     sku: 'NL-SHO-X2',
@@ -154,25 +159,33 @@ export const mockProducts: Product[] = [
 ]
 
 /**
- * Categorias NOIR_LUXE — slugs PT-BR. Mantidas em uma única fonte da verdade
- * para facilitar a evolução (filtros, integração API, traduções).
+ * Slugs de categoria — exatamente os 4 que a Fakestore API retorna.
+ * Mantemos como `as const` para tipagem strict no resto da aplicação.
  */
 export const productCategories = [
-  'casacos',
-  'calcados',
-  'relogios',
-  'fragrancias',
-  'boutique',
+  'electronics',
+  'jewelery',
+  "men's clothing",
+  "women's clothing",
 ] as const
 
 export type CategorySlug = (typeof productCategories)[number]
 
+/**
+ * Map slug → label visível NOIR_LUXE. Os labels foram escolhidos para
+ * manter a identidade luxo do Figma (Casacos, Calçados, Relógios, Fragrâncias)
+ * mesmo que o slug subjacente seja o da Fakestore.
+ */
 export const categoryLabels: Record<CategorySlug, string> = {
-  casacos: 'Casacos',
-  calcados: 'Calçados',
-  relogios: 'Relógios',
-  fragrancias: 'Fragrâncias',
-  boutique: 'Boutique',
+  electronics: 'Relógios',
+  jewelery: 'Fragrâncias',
+  "men's clothing": 'Casacos',
+  "women's clothing": 'Calçados',
+}
+
+/** Retorna o label PT-BR para um slug, ou o próprio slug se não for um dos 4. */
+export function getCategoryLabel(slug: string): string {
+  return (categoryLabels as Record<string, string>)[slug] ?? slug
 }
 
 export const mockUsers: User[] = [

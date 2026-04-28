@@ -12,18 +12,6 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <script>
-      // Aplica tema antes do React montar (default: dark — identidade NOIR_LUXE)
-      (function () {
-        try {
-          var stored = localStorage.getItem('theme');
-          var theme = stored || 'dark';
-          if (theme === 'dark') document.documentElement.classList.add('dark');
-        } catch (e) {
-          document.documentElement.classList.add('dark');
-        }
-      })();
-    </script>
   </head>
   <body class="antialiased">
     <div id="root"></div>

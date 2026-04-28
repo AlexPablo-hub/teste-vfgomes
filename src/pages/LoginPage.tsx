@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight, Eye, EyeOff, Lock, User as UserIcon } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { cn } from '@/lib/cn'
 
 type Tab = 'client' | 'admin'
@@ -63,11 +62,7 @@ export function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen w-full overflow-hidden bg-[var(--color-background)]">
-      <div className="absolute right-4 top-4 z-30">
-        <ThemeToggle />
-      </div>
-
-      {/* Decoração: blur circles violeta — sutis em ambos os modos */}
+      {/* Decoração: blur circles violeta */}
       <div
         aria-hidden
         className="pointer-events-none absolute -right-[250px] -top-[250px] h-[500px] w-[500px] rounded-full bg-[var(--color-primary)]/10 blur-[60px]"

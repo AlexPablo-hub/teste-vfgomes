@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCartStore } from '@/stores/cartStore'
 import { Button } from '@/components/ui/Button'
-import { ThemeToggle } from './ThemeToggle'
 import { CartDrawer } from '@/components/cart/CartDrawer'
 import { cn } from '@/lib/cn'
 
@@ -82,8 +81,6 @@ export function Header() {
                 </span>
               )}
             </button>
-
-            <ThemeToggle />
 
             <div className="relative hidden md:block">
               <button

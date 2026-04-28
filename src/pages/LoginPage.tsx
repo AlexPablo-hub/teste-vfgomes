@@ -62,22 +62,22 @@ export function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full overflow-hidden bg-[#020617]">
+    <div className="relative flex min-h-screen w-full overflow-hidden bg-[var(--color-background)]">
       <div className="absolute right-4 top-4 z-30">
         <ThemeToggle />
       </div>
 
-      {/* Decoração: blur circles violeta */}
+      {/* Decoração: blur circles violeta — sutis em ambos os modos */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-[250px] -top-[250px] h-[500px] w-[500px] rounded-full bg-[#7c3aed]/10 blur-[60px]"
+        className="pointer-events-none absolute -right-[250px] -top-[250px] h-[500px] w-[500px] rounded-full bg-[var(--color-primary)]/10 blur-[60px]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-[250px] -left-[250px] h-[500px] w-[500px] rounded-full bg-[#7c3aed]/[0.05] blur-[60px]"
+        className="pointer-events-none absolute -bottom-[250px] -left-[250px] h-[500px] w-[500px] rounded-full bg-[var(--color-primary)]/5 blur-[60px]"
       />
 
-      {/* HERO — esquerda */}
+      {/* HERO — esquerda (sempre dark, sobreposto a imagem escura) */}
       <aside className="relative hidden flex-1 items-end overflow-hidden lg:flex">
         <img
           src="/images/Image_b5jtkjb5jtkjb5jt.png"
@@ -97,34 +97,34 @@ export function LoginPage() {
           <h1 className="text-[48px] font-bold uppercase leading-[52.8px] tracking-[-2.4px] text-white">
             NOIR LUXE
           </h1>
-          <p className="max-w-[448px] text-[18px] leading-[28.8px] text-[#cbd5e1]">
+          <p className="max-w-[448px] text-[18px] leading-[28.8px] text-slate-300">
             A seleção definitiva para quem exige o extraordinário.
           </p>
           <div className="mt-4 flex items-center gap-4">
-            <span aria-hidden className="h-0.5 w-12 bg-[#7c3aed]" />
-            <span className="text-xs font-semibold uppercase tracking-[1.2px] text-[#94a3b8]">
+            <span aria-hidden className="h-0.5 w-12 bg-[var(--color-primary)]" />
+            <span className="text-xs font-semibold uppercase tracking-[1.2px] text-slate-400">
               EST. 2026
             </span>
           </div>
         </div>
       </aside>
 
-      {/* FORM — direita */}
-      <section className="relative flex flex-1 items-center justify-center bg-[#020617] px-6 py-10 sm:px-10 lg:p-24">
+      {/* FORM — direita (responde ao toggle de tema) */}
+      <section className="relative flex flex-1 items-center justify-center bg-[var(--color-background)] px-6 py-10 sm:px-10 lg:p-24">
         <div className="w-full max-w-[440px]">
-          {/* Marca em mobile (substitui o hero) */}
+          {/* Marca em mobile */}
           <div className="mb-10 flex items-center gap-3 lg:hidden">
-            <span aria-hidden className="h-0.5 w-8 bg-[#7c3aed]" />
-            <span className="text-base font-bold uppercase tracking-[0.2em] text-white">
+            <span aria-hidden className="h-0.5 w-8 bg-[var(--color-primary)]" />
+            <span className="text-base font-bold uppercase tracking-[0.2em] text-[var(--color-foreground)]">
               NOIR LUXE
             </span>
           </div>
 
           <div className="flex flex-col gap-[7px]">
-            <h2 className="text-[30px] font-semibold leading-9 tracking-[-0.3px] text-white">
+            <h2 className="text-[30px] font-semibold leading-9 tracking-[-0.3px] text-[var(--color-foreground)]">
               Bem-vindo de volta
             </h2>
-            <p className="text-[16px] leading-[25.6px] text-[#94a3b8]">
+            <p className="text-[16px] leading-[25.6px] text-[var(--color-foreground-subtle)]">
               Por favor, insira suas credenciais para continuar.
             </p>
           </div>
@@ -133,7 +133,7 @@ export function LoginPage() {
           <div
             role="tablist"
             aria-label="Tipo de conta"
-            className="mt-12 flex items-center justify-center gap-0 rounded-xl border border-white/10 bg-[rgba(25,31,49,0.8)] p-[5px] backdrop-blur-md"
+            className="mt-12 flex items-center justify-center gap-0 rounded-xl border border-[var(--color-border)] bg-[var(--color-secondary)] p-[5px] backdrop-blur-md"
           >
             {(['client', 'admin'] as const).map((t) => (
               <button
@@ -145,8 +145,8 @@ export function LoginPage() {
                 className={cn(
                   'flex-1 rounded-lg px-6 py-3 text-sm font-medium tracking-[0.28px] transition-all',
                   tab === t
-                    ? 'bg-[#7c3aed] text-white shadow-sm'
-                    : 'text-[#94a3b8] hover:text-white',
+                    ? 'bg-[var(--color-primary)] text-white shadow-sm'
+                    : 'text-[var(--color-foreground-subtle)] hover:text-[var(--color-foreground)]',
                 )}
               >
                 {t === 'client' ? 'Cliente' : 'Administrador'}
@@ -157,11 +157,11 @@ export function LoginPage() {
           <form onSubmit={handleSubmit} className="mt-12 flex flex-col gap-6" noValidate>
             {/* Usuário */}
             <div className="flex flex-col gap-2">
-              <label htmlFor="login-username" className="text-sm font-medium tracking-[0.28px] text-[#cbd5e1]">
+              <label htmlFor="login-username" className="text-sm font-medium tracking-[0.28px] text-[var(--color-foreground-muted)]">
                 Usuário
               </label>
               <div className="relative">
-                <span aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#475569]">
+                <span aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-foreground-faintest)]">
                   <UserIcon className="h-4 w-4" />
                 </span>
                 <input
@@ -174,11 +174,11 @@ export function LoginPage() {
                   autoFocus
                   aria-invalid={!!fieldErrors.username}
                   aria-describedby={fieldErrors.username ? 'login-username-error' : undefined}
-                  className="h-14 w-full rounded-xl border border-white/10 bg-[rgba(15,23,42,0.5)] pl-[49px] pr-4 text-[16px] text-white placeholder:text-[#475569] transition-colors focus:border-[#7c3aed] focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/30"
+                  className="h-14 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-input)] pl-[49px] pr-4 text-[16px] text-[var(--color-foreground)] placeholder:text-[var(--color-foreground-faintest)] transition-colors focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
                 />
               </div>
               {fieldErrors.username && (
-                <p id="login-username-error" className="text-xs text-red-400">
+                <p id="login-username-error" className="text-xs text-[var(--color-destructive)]">
                   {fieldErrors.username}
                 </p>
               )}
@@ -187,18 +187,18 @@ export function LoginPage() {
             {/* Senha */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="login-password" className="text-sm font-medium tracking-[0.28px] text-[#cbd5e1]">
+                <label htmlFor="login-password" className="text-sm font-medium tracking-[0.28px] text-[var(--color-foreground-muted)]">
                   Senha
                 </label>
                 <button
                   type="button"
-                  className="text-xs font-semibold tracking-[0.6px] text-[#7c3aed] hover:underline"
+                  className="text-xs font-semibold tracking-[0.6px] text-[var(--color-violet-soft)] hover:underline"
                 >
                   Esqueceu a Senha?
                 </button>
               </div>
               <div className="relative">
-                <span aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#475569]">
+                <span aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-foreground-faintest)]">
                   <Lock className="h-4 w-4" />
                 </span>
                 <input
@@ -210,12 +210,12 @@ export function LoginPage() {
                   autoComplete="current-password"
                   aria-invalid={!!fieldErrors.password}
                   aria-describedby={fieldErrors.password ? 'login-password-error' : undefined}
-                  className="h-14 w-full rounded-xl border border-white/10 bg-[rgba(15,23,42,0.5)] pl-[49px] pr-12 text-[16px] text-white placeholder:text-[#475569] transition-colors focus:border-[#7c3aed] focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/30"
+                  className="h-14 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-input)] pl-[49px] pr-12 text-[16px] text-[var(--color-foreground)] placeholder:text-[var(--color-foreground-faintest)] transition-colors focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#475569] transition-colors hover:text-white"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-foreground-faintest)] transition-colors hover:text-[var(--color-foreground)]"
                   aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                   tabIndex={-1}
                 >
@@ -223,7 +223,7 @@ export function LoginPage() {
                 </button>
               </div>
               {fieldErrors.password && (
-                <p id="login-password-error" className="text-xs text-red-400">
+                <p id="login-password-error" className="text-xs text-[var(--color-destructive)]">
                   {fieldErrors.password}
                 </p>
               )}
@@ -232,7 +232,7 @@ export function LoginPage() {
             {error && (
               <div
                 role="alert"
-                className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 animate-fade-in"
+                className="rounded-xl border border-[var(--color-destructive)]/30 bg-[var(--color-destructive)]/10 px-4 py-3 text-sm text-[var(--color-destructive)] animate-fade-in"
               >
                 {error}
               </div>
@@ -241,7 +241,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#7c3aed] text-[18px] font-normal text-white shadow-[0px_20px_25px_-5px_rgba(76,29,149,0.2),0px_8px_10px_-6px_rgba(76,29,149,0.2)] transition-all hover:bg-[#6d28d9] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[var(--color-primary)] text-[18px] font-normal text-white shadow-[0px_20px_25px_-5px_rgba(76,29,149,0.2),0px_8px_10px_-6px_rgba(76,29,149,0.2)] transition-all hover:bg-[var(--color-violet-strong)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {submitting ? 'Entrando…' : (
                 <>
@@ -252,10 +252,10 @@ export function LoginPage() {
           </form>
 
           {/* Footer */}
-          <div className="mt-12 flex flex-col gap-4 border-t border-white/5 pt-8">
-            <p className="text-center text-base text-[#64748b]">
+          <div className="mt-12 flex flex-col gap-4 border-t border-[var(--color-border-subtle)] pt-8">
+            <p className="text-center text-base text-[var(--color-foreground-faint)]">
               Não tem uma conta?{' '}
-              <button type="button" className="font-normal text-white hover:underline">
+              <button type="button" className="font-medium text-[var(--color-foreground)] hover:underline">
                 Solicitar Acesso
               </button>
             </p>
@@ -264,7 +264,7 @@ export function LoginPage() {
                 <li key={label}>
                   <a
                     href="#"
-                    className="text-xs font-semibold uppercase tracking-[1.2px] text-[#475569] transition-colors hover:text-white"
+                    className="text-xs font-semibold uppercase tracking-[1.2px] text-[var(--color-foreground-faintest)] transition-colors hover:text-[var(--color-foreground)]"
                   >
                     {label}
                   </a>

@@ -8,53 +8,97 @@
 
   --tracking-brand: 0.18em;
 
-  /* Light mode (toggle secundário) */
-  --color-background: oklch(99% 0 0);
-  --color-foreground: oklch(15% 0.02 270);
-  --color-muted: oklch(96% 0.005 270);
-  --color-muted-foreground: oklch(48% 0.01 270);
-  --color-card: oklch(100% 0 0);
-  --color-card-foreground: oklch(15% 0.02 270);
-  --color-border: oklch(92% 0.005 270);
-  --color-input: oklch(96% 0.005 270);
-  --color-primary: oklch(55% 0.25 295);
-  --color-primary-foreground: oklch(99% 0 0);
-  --color-secondary: oklch(96% 0.005 270);
-  --color-secondary-foreground: oklch(15% 0.02 270);
-  --color-accent: oklch(70% 0.18 75);
-  --color-accent-foreground: oklch(15% 0.02 270);
-  --color-destructive: oklch(58% 0.22 27);
-  --color-destructive-foreground: oklch(99% 0 0);
-  --color-success: oklch(65% 0.16 155);
-  --color-success-foreground: oklch(99% 0 0);
-  --color-warning: oklch(75% 0.16 75);
-  --color-warning-foreground: oklch(15% 0.02 270);
-  --color-ring: oklch(55% 0.25 295);
+  /* ========================================================================
+   * LIGHT MODE — NOIR_LUXE Pearl
+   * Identidade clara, sofisticada. Branco + slate hierarchy + violeta da marca.
+   * Usado quando o usuário ativa o toggle de tema. Default = dark.
+   * ======================================================================== */
+
+  /* Surfaces */
+  --color-background: #ffffff;
+  --color-card: #ffffff;
+  --color-input: #f8fafc;            /* slate-50 — input bg */
+  --color-muted: #f1f5f9;            /* slate-100 — subtle bg */
+  --color-secondary: #f1f5f9;
+  --color-accent: #fef3c7;            /* amber-100 — accent surface */
+
+  /* Foreground hierarchy (slate em light) */
+  --color-foreground: #0f172a;             /* slate-900 — texto primário */
+  --color-foreground-muted: #334155;       /* slate-700 — labels, secundário */
+  --color-foreground-subtle: #64748b;      /* slate-500 — copy, tagline */
+  --color-foreground-faint: #94a3b8;       /* slate-400 — meta info */
+  --color-foreground-faintest: #cbd5e1;    /* slate-300 — placeholders, ícones */
+
+  --color-card-foreground: #0f172a;
+  --color-muted-foreground: #64748b;
+  --color-secondary-foreground: #0f172a;
+  --color-accent-foreground: #78350f;
+
+  /* Borders */
+  --color-border: #e2e8f0;            /* slate-200 */
+  --color-border-subtle: #f1f5f9;     /* slate-100 — divisores ainda mais suaves */
+
+  /* Brand violet — mantém o roxo NOIR_LUXE em ambos os modos */
+  --color-primary: #7c3aed;
+  --color-primary-foreground: #ffffff;
+  --color-violet-strong: #6d28d9;     /* hover/active */
+  --color-violet-soft: #5b21b6;       /* texto/links em light (mais contraste sobre branco) */
+  --color-violet-glow: 124 58 237;    /* RGB para shadows: rgba(124,58,237,...) */
+
+  /* Status */
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+  --color-success: #059669;
+  --color-success-foreground: #ffffff;
+  --color-warning: #d97706;
+  --color-warning-foreground: #ffffff;
+  --color-ring: #7c3aed;
 }
 
 :root.dark {
-  /* NOIR_LUXE — paleta principal */
-  --color-background: oklch(13% 0.018 270);
-  --color-foreground: oklch(97% 0.005 270);
-  --color-muted: oklch(20% 0.018 270);
-  --color-muted-foreground: oklch(65% 0.015 270);
-  --color-card: oklch(17% 0.018 270);
-  --color-card-foreground: oklch(97% 0.005 270);
-  --color-border: oklch(24% 0.018 270);
-  --color-input: oklch(20% 0.018 270);
-  --color-primary: oklch(65% 0.22 295);
-  --color-primary-foreground: oklch(99% 0 0);
-  --color-secondary: oklch(22% 0.018 270);
-  --color-secondary-foreground: oklch(97% 0.005 270);
-  --color-accent: oklch(72% 0.14 75);
-  --color-accent-foreground: oklch(13% 0.018 270);
-  --color-destructive: oklch(62% 0.22 27);
-  --color-destructive-foreground: oklch(99% 0 0);
-  --color-success: oklch(68% 0.18 155);
-  --color-success-foreground: oklch(13% 0.018 270);
-  --color-warning: oklch(78% 0.16 75);
-  --color-warning-foreground: oklch(13% 0.018 270);
-  --color-ring: oklch(65% 0.22 295);
+  /* ========================================================================
+   * DARK MODE — NOIR_LUXE Noir (default, identidade principal)
+   * ======================================================================== */
+
+  /* Surfaces */
+  --color-background: #020617;          /* slate-950 — fundo principal */
+  --color-card: rgba(15, 23, 42, 0.8);  /* slate-900/80 com backdrop-blur */
+  --color-input: rgba(15, 23, 42, 0.5);
+  --color-muted: rgba(255, 255, 255, 0.05);
+  --color-secondary: rgba(25, 31, 49, 0.8);
+  --color-accent: rgba(245, 158, 11, 0.15);
+
+  /* Foreground hierarchy (cinza-claro hierarchy em dark) */
+  --color-foreground: #ffffff;
+  --color-foreground-muted: #cbd5e1;        /* slate-300 — labels */
+  --color-foreground-subtle: #94a3b8;       /* slate-400 — copy */
+  --color-foreground-faint: #64748b;        /* slate-500 — meta */
+  --color-foreground-faintest: #475569;     /* slate-600 — placeholders */
+
+  --color-card-foreground: #ffffff;
+  --color-muted-foreground: #94a3b8;
+  --color-secondary-foreground: #ffffff;
+  --color-accent-foreground: #fbbf24;
+
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+
+  /* Brand violet — em dark usamos o tom mais claro como accent text */
+  --color-primary: #7c3aed;
+  --color-primary-foreground: #ffffff;
+  --color-violet-strong: #6d28d9;
+  --color-violet-soft: #a78bfa;             /* mais claro para contraste em dark */
+  --color-violet-glow: 124 58 237;
+
+  /* Status */
+  --color-destructive: #f87171;
+  --color-destructive-foreground: #ffffff;
+  --color-success: #34d399;
+  --color-success-foreground: #022c22;
+  --color-warning: #fbbf24;
+  --color-warning-foreground: #422006;
+  --color-ring: #a78bfa;
 }
 
 @layer base {

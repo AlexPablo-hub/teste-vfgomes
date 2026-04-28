@@ -46,7 +46,6 @@ Para o teste técnico as seguintes caracteristicas serão avaliadas:
     - Estados visuais de loading, erro e vazio
     - Feedback visual em interações (hover, active, transições suaves)
     - Acessibilidade básica (labels, alt em imagens, foco visível)
-    - Tema claro/escuro
 - Consumo de API e Tipagem Typescript
 - Estruturação de pastas e arquivos (components, pages, services, hooks)
 - Contexto do React (Context API)

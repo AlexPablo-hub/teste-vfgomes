@@ -1,17 +1,20 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { ArrowRight, Eye, EyeOff, Lock, User as UserIcon } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Loader2, Lock, User as UserIcon } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/lib/toast'
 import { cn } from '@/lib/cn'
+import { staggerContainer, staggerItem } from '@/lib/motion'
+import { resolveTarget, ROLE_HOME } from '@/lib/auth-routes'
 
 type Tab = 'client' | 'admin'
 
 export function LoginPage() {
-  const { login, isAuthenticated, role } = useAuth()
+  const { login, logout, isAuthenticated, role } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [tab, setTab] = useState<Tab>('admin')
+  const [tab, setTab] = useState<Tab>('client')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -19,9 +22,13 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string }>({})
 
-  if (isAuthenticated) {
-    const target = role === 'admin' ? '/admin/estoque' : '/products'
-    return <Navigate to={target} replace />
+  // Refs para foco programático após erro (acessibilidade — usuário não precisa
+  // achar o campo errado; cursor já vai pra ele).
+  const usernameRef = useRef<HTMLInputElement>(null)
+  const passwordRef = useRef<HTMLInputElement>(null)
+
+  if (isAuthenticated && role) {
+    return <Navigate to={ROLE_HOME[role]} replace />
   }
 
   const validate = () => {
@@ -29,6 +36,8 @@ export function LoginPage() {
     if (!username.trim()) errs.username = 'Informe seu usuário.'
     if (!password) errs.password = 'Informe sua senha.'
     setFieldErrors(errs)
+    if (errs.username) usernameRef.current?.focus()
+    else if (errs.password) passwordRef.current?.focus()
     return Object.keys(errs).length === 0
   }
 
@@ -41,24 +50,39 @@ export function LoginPage() {
     setSubmitting(false)
     if (!result.ok) {
       setError(result.error)
+      // Foca no campo senha + seleciona o conteúdo para o usuário corrigir rápido
+      passwordRef.current?.focus()
+      passwordRef.current?.select()
       return
     }
+
+    // Tab "Administrador" exige role admin de verdade. Se um cliente tentar
+    // logar pela aba admin, derruba a sessão recém-criada e bloqueia.
+    // Feedback apenas via toast — não polui o form com banner persistente.
+    if (tab === 'admin' && result.user.role !== 'admin') {
+      logout()
+      toast.error('Você não tem permissão de administrador.', {
+        description: 'Use a aba "Cliente" para entrar com sua conta.',
+      })
+      passwordRef.current?.focus()
+      passwordRef.current?.select()
+      return
+    }
+
+    // Decide para onde navegar:
+    // - Tab Cliente: sempre /products (admin pode usar área cliente também)
+    // - Tab Admin + admin: /admin/estoque (ou from se for rota admin válida)
     const from = (location.state as { from?: string } | null)?.from
-    const target = from ?? (result.user.role === 'admin' ? '/admin/estoque' : '/products')
+    const target = tab === 'admin' ? resolveTarget('admin', from) : '/products'
     navigate(target, { replace: true })
   }
 
   const handleTabChange = (next: Tab) => {
     setTab(next)
-    if (next === 'admin') {
-      setUsername('mor_2314')
-      setPassword('83r5^_')
-    } else {
-      setUsername('kevinryan')
-      setPassword('kev02937@')
-    }
     setError(null)
     setFieldErrors({})
+    // Move o foco para o campo de usuário para iniciar a digitação imediatamente.
+    usernameRef.current?.focus()
   }
 
   return (
@@ -76,7 +100,7 @@ export function LoginPage() {
       {/* HERO — esquerda (sempre dark, sobreposto a imagem escura) */}
       <aside className="relative hidden flex-1 items-end overflow-hidden lg:flex">
         <img
-          src="/images/Image_b5jtkjb5jtkjb5jt.png"
+          src="/images/ImageLogin.png"
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"
@@ -89,44 +113,61 @@ export function LoginPage() {
               'linear-gradient(58deg, rgb(2,6,23) 0%, rgba(2,6,23,0.2) 50%, rgba(2,6,23,0) 100%)',
           }}
         />
-        <div className="relative z-10 flex w-full flex-col gap-[14.9px] p-20">
-          <h1 className="text-[48px] font-bold uppercase leading-[52.8px] tracking-[-2.4px] text-white">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="relative z-10 flex w-full flex-col gap-[14.9px] p-20"
+        >
+          <motion.h1
+            variants={staggerItem}
+            className="text-[48px] font-bold uppercase leading-[52.8px] tracking-[-2.4px] text-white"
+          >
             NOIR LUXE
-          </h1>
-          <p className="max-w-[448px] text-[18px] leading-[28.8px] text-slate-300">
+          </motion.h1>
+          <motion.p
+            variants={staggerItem}
+            className="max-w-[448px] text-[18px] leading-[28.8px] text-slate-300"
+          >
             A seleção definitiva para quem exige o extraordinário.
-          </p>
-          <div className="mt-4 flex items-center gap-4">
+          </motion.p>
+          <motion.div variants={staggerItem} className="mt-4 flex items-center gap-4">
             <span aria-hidden className="h-0.5 w-12 bg-[var(--color-primary)]" />
             <span className="text-xs font-semibold uppercase tracking-[1.2px] text-slate-400">
               EST. 2026
             </span>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </aside>
 
-      {/* FORM — direita (responde ao toggle de tema) */}
-      <section className="relative flex flex-1 items-center justify-center bg-[var(--color-background)] px-6 py-10 sm:px-10 lg:p-24">
-        <div className="w-full max-w-[440px]">
+      {/* FORM — direita */}
+      <section className="relative flex flex-1 items-center justify-center bg-[var(--color-background)] px-6 py-10 sm:px-10 md:px-16 md:py-16 lg:p-24">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="w-full max-w-[440px] md:max-w-[480px] lg:max-w-[440px]"
+        >
           {/* Marca em mobile */}
-          <div className="mb-10 flex items-center gap-3 lg:hidden">
+          <motion.div variants={staggerItem} className="mb-10 flex items-center gap-3 lg:hidden">
             <span aria-hidden className="h-0.5 w-8 bg-[var(--color-primary)]" />
             <span className="text-base font-bold uppercase tracking-[0.2em] text-[var(--color-foreground)]">
               NOIR LUXE
             </span>
-          </div>
+          </motion.div>
 
-          <div className="flex flex-col gap-[7px]">
+          <motion.div variants={staggerItem} className="flex flex-col gap-[7px]">
             <h2 className="text-[30px] font-semibold leading-9 tracking-[-0.3px] text-[var(--color-foreground)]">
               Bem-vindo de volta
             </h2>
             <p className="text-[16px] leading-[25.6px] text-[var(--color-foreground-subtle)]">
               Por favor, insira suas credenciais para continuar.
             </p>
-          </div>
+          </motion.div>
 
           {/* Toggle Cliente/Administrador */}
-          <div
+          <motion.div
+            variants={staggerItem}
             role="tablist"
             aria-label="Tipo de conta"
             className="mt-12 flex items-center justify-center gap-0 rounded-xl border border-[var(--color-border)] bg-[var(--color-secondary)] p-[5px] backdrop-blur-md"
@@ -148,9 +189,14 @@ export function LoginPage() {
                 {t === 'client' ? 'Cliente' : 'Administrador'}
               </button>
             ))}
-          </div>
+          </motion.div>
 
-          <form onSubmit={handleSubmit} className="mt-12 flex flex-col gap-6" noValidate>
+          <motion.form
+            variants={staggerItem}
+            onSubmit={handleSubmit}
+            className="mt-12 flex flex-col gap-6"
+            noValidate
+          >
             {/* Usuário */}
             <div className="flex flex-col gap-2">
               <label htmlFor="login-username" className="text-sm font-medium tracking-[0.28px] text-[var(--color-foreground-muted)]">
@@ -162,6 +208,7 @@ export function LoginPage() {
                 </span>
                 <input
                   id="login-username"
+                  ref={usernameRef}
                   type="text"
                   placeholder="Digite seu usuário"
                   value={username}
@@ -205,6 +252,7 @@ export function LoginPage() {
                 </span>
                 <input
                   id="login-password"
+                  ref={passwordRef}
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
@@ -243,18 +291,27 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={submitting}
+              aria-busy={submitting}
               className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[var(--color-primary)] text-[18px] font-normal text-white shadow-[0px_20px_25px_-5px_rgba(76,29,149,0.2),0px_8px_10px_-6px_rgba(76,29,149,0.2)] transition-all hover:bg-[var(--color-violet-strong)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {submitting ? 'Entrando…' : (
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  Entrando…
+                </>
+              ) : (
                 <>
                   Entrar <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
-          </form>
+          </motion.form>
 
           {/* Footer */}
-          <div className="mt-12 flex flex-col gap-4 border-t border-[var(--color-border-subtle)] pt-8">
+          <motion.div
+            variants={staggerItem}
+            className="mt-12 flex flex-col gap-4 border-t border-[var(--color-border-subtle)] pt-8"
+          >
             <p className="text-center text-base text-[var(--color-foreground-faint)]">
               Não tem uma conta?{' '}
               <button
@@ -270,20 +327,8 @@ export function LoginPage() {
                 Solicitar Acesso
               </button>
             </p>
-            <ul className="flex items-center justify-center gap-6">
-              {['PRIVACIDADE', 'TERMOS', 'SUPORTE'].map((label) => (
-                <li key={label}>
-                  <a
-                    href="#"
-                    className="text-xs font-semibold uppercase tracking-[1.2px] text-[var(--color-foreground-faintest)] transition-colors hover:text-[var(--color-foreground)]"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
     </div>
   )

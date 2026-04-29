@@ -50,7 +50,6 @@ Scripts disponíveis (em `package.json`):
 | `npm run dev` | Sobe o Vite em `http://localhost:5173` |
 | `npm run build` | Type-check (`tsc -b`) + build de produção em `dist/` |
 | `npm run preview` | Serve o build local pra validar antes do deploy |
-| `npm run lint` | ESLint em todo o projeto |
 | `npm test` | Roda a suíte Vitest uma vez (CI) |
 | `npm run test:watch` | Vitest em watch (re-roda ao salvar) |
 | `npm run test:ui` | Dashboard visual do Vitest |
@@ -61,7 +60,7 @@ Scripts disponíveis (em `package.json`):
 
 Workflow GitHub Actions em [.github/workflows/ci.yml](.github/workflows/ci.yml) — roda em todo `push` e `pull_request` na `master`:
 
-- **Job `unit`** — type-check (`tsc -b`) → lint → Vitest (147 testes) → build de produção
+- **Job `unit`** — type-check (`tsc -b`) → Vitest (147 testes) → build de produção
 - **Job `e2e`** — depende do `unit` passar; instala Chromium + roda Playwright (specs em `e2e/`)
 
 Quando algum spec E2E falha, o report HTML é exportado como artifact `playwright-report` (mantido por 7 dias) — facilita ver screenshots e traces direto no GitHub.
@@ -134,7 +133,7 @@ src/
 - **Axios** — instance com interceptor que mapeia `AxiosError` para classes tipadas (`ApiError`, `NetworkError`, `AuthError`, `ValidationError`)
 - **Lucide React** — ícones
 - **Vitest + Testing Library + MSW + jsdom** — **147 testes** (unit, services, stores, páginas admin e cliente) com mock HTTP em camada de rede
-- **ESLint + tsc strict** — guarda-rails de qualidade
+- **TypeScript strict** — `tsc -b` no build, sem `any` no app
 
 Decisões transversais:
 

@@ -14,15 +14,8 @@ export const ENDPOINTS = {
   // Products
   products: '/products',
   product: (id: number | string) => `/products/${id}`,
-  productsCategories: '/products/categories',
-  productsByCategory: (cat: string) => `/products/category/${encodeURIComponent(cat)}`,
 
   // Users
   users: '/users',
   user: (id: number | string) => `/users/${id}`,
-
-  // Carts
-  carts: '/carts',
-  cart: (id: number | string) => `/carts/${id}`,
-  userCarts: (userId: number | string) => `/carts/user/${userId}`,
 } as const

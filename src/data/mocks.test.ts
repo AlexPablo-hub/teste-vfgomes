@@ -3,7 +3,6 @@ import {
   productCategories,
   categoryLabels,
   getCategoryLabel,
-  mockProducts,
   mockUsers,
 } from './mocks'
 
@@ -33,13 +32,6 @@ describe('mocks data', () => {
 
   it('getCategoryLabel devolve o slug se não conhecido (fallback)', () => {
     expect(getCategoryLabel('outro')).toBe('outro')
-  })
-
-  it('todos os mockProducts usam categorias válidas', () => {
-    const valid = new Set(productCategories)
-    for (const p of mockProducts) {
-      expect(valid.has(p.category as (typeof productCategories)[number])).toBe(true)
-    }
   })
 
   it('mockUsers contém as 2 contas exigidas pelo README', () => {

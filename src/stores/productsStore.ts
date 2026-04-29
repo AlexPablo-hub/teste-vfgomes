@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Product, ProductDraft } from '@/types/product'
-import { mockProducts } from '@/data/mocks'
 
 interface ProductsState {
   products: Product[]
@@ -23,7 +22,7 @@ interface ProductsState {
 export const useProductsStore = create<ProductsState>()(
   persist(
     (set, get) => ({
-      products: mockProducts,
+      products: [],
       hydratedAt: null,
 
       add: (draft) => {
@@ -45,7 +44,7 @@ export const useProductsStore = create<ProductsState>()(
       setAll: (products) => set({ products }),
       markHydrated: () => set({ hydratedAt: Date.now() }),
 
-      reset: () => set({ products: mockProducts, hydratedAt: null }),
+      reset: () => set({ products: [], hydratedAt: null }),
     }),
     {
       name: 'fakestore-products',

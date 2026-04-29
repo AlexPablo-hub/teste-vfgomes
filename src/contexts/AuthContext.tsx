@@ -6,6 +6,7 @@ import type { AuthUser, Role } from '@/types/user'
 import { useUsersStore } from '@/stores/usersStore'
 import { useProductsStore } from '@/stores/productsStore'
 import { useCartStore } from '@/stores/cartStore'
+import { useFavoritesStore } from '@/stores/favoritesStore'
 
 interface AuthContextValue {
   user: AuthUser | null
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useUsersStore.getState().reset()
     useProductsStore.getState().reset()
     useCartStore.getState().clear()
+    useFavoritesStore.getState().clear()
   }, [])
 
   const value = useMemo<AuthContextValue>(

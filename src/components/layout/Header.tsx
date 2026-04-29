@@ -1,47 +1,56 @@
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { ShoppingBag, LogOut, User as UserIcon, Menu, X } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { ShoppingBag, LogOut, User as UserIcon, Menu, X, Heart } from 'lucide-react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { useCartStore } from '@/stores/cartStore'
+import { useFavoritesStore } from '@/stores/favoritesStore'
 import { Button } from '@/components/ui/Button'
 import { CartDrawer } from '@/components/cart/CartDrawer'
-import { cn } from '@/lib/cn'
+import { FavoritesDrawer } from '@/components/favorites/FavoritesDrawer'
 import { slideDown } from '@/lib/motion'
-
-const sections = [
-  { to: '/products', label: 'Novidades' },
-  { to: '/products?section=collections', label: 'Coleções' },
-  { to: '/products?section=boutique', label: 'Boutique' },
-  { to: '/products?section=editorial', label: 'Editorial' },
-]
 
 export function Header() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const totalItems = useCartStore((s) => s.items.reduce((acc, i) => acc + i.quantity, 0))
+  // Páginas que usam header minimal — apenas wordmark NOIR LUXE centralizado,
+  // sem botões de carrinho/favoritos/usuário. Útil em rotas de "estado final"
+  // como o comprovante de pedido, onde o usuário não deve ser tentado a sair.
+  const isMinimalRoute = location.pathname === '/checkout/sucesso'
+  // Contagem = produtos distintos no carrinho (não soma de quantidades).
+  // Mudar a quantidade de um item já no carrinho NÃO incrementa esse badge —
+  // só adicionar um produto novo distinto faz subir.
+  const distinctCartItems = useCartStore((s) => s.items.length)
+  const favoritesCount = useFavoritesStore((s) => s.items.length)
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
+  const [favoritesOpen, setFavoritesOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
     navigate('/login', { replace: true })
   }
 
-  // Detail page mostra "Coleções" ativo (per Figma); catalog mostra "Novidades" ativo
-  const isDetailPage = location.pathname.startsWith('/products/')
-
-  const navLinkClass = ({ isActive }: { isActive: boolean }) => {
-    const fakeActive = isDetailPage
-      ? sections.findIndex((s) => s.to === '/products?section=collections') >= 0
-      : false
-    return cn(
-      'relative px-0 pb-1.5 text-sm tracking-[0.35px] transition-colors',
-      isActive || fakeActive
-        ? 'text-[#a78bfa] border-b-2 border-[#7c3aed]'
-        : 'text-[#94a3b8] hover:text-white',
+  if (isMinimalRoute) {
+    return (
+      <motion.header
+        variants={slideDown}
+        initial="hidden"
+        animate="visible"
+        className="sticky top-0 z-30 h-20 border-b border-white/10 bg-[rgba(2,6,23,0.8)] backdrop-blur-[12px] print:hidden"
+      >
+        <div className="mx-auto flex h-full max-w-[1536px] items-center justify-center px-8">
+          <Link
+            to="/products"
+            className="brand-wordmark font-black uppercase tracking-[-1.2px] text-2xl text-white"
+            aria-label="Voltar para a loja"
+          >
+            NOIR LUXE
+          </Link>
+        </div>
+      </motion.header>
     )
   }
 
@@ -59,30 +68,31 @@ export function Header() {
             NOIR LUXE
           </Link>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            {sections.map((s, i) => (
-              <NavLink
-                key={s.label}
-                to={s.to}
-                end={i === 0}
-                className={navLinkClass}
-              >
-                {s.label}
-              </NavLink>
-            ))}
-          </nav>
-
           <div className="flex items-center gap-6">
             <button
               type="button"
               onClick={() => setCartOpen(true)}
-              aria-label={`Abrir carrinho (${totalItems} itens)`}
+              aria-label={`Abrir carrinho (${distinctCartItems} ${distinctCartItems === 1 ? 'produto' : 'produtos'})`}
               className="relative grid place-items-center text-white hover:opacity-80"
             >
               <ShoppingBag className="h-5 w-5" />
-              {totalItems > 0 && (
+              {distinctCartItems > 0 && (
                 <span className="absolute -right-1.5 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#7c3aed] px-1 text-[10px] font-bold text-white">
-                  {totalItems}
+                  {distinctCartItems}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFavoritesOpen(true)}
+              aria-label={`Abrir favoritos (${favoritesCount} ${favoritesCount === 1 ? 'item' : 'itens'})`}
+              className="relative grid place-items-center text-white hover:opacity-80"
+            >
+              <Heart className="h-5 w-5" />
+              {favoritesCount > 0 && (
+                <span className="absolute -right-1.5 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#7c3aed] px-1 text-[10px] font-bold text-white">
+                  {favoritesCount}
                 </span>
               )}
             </button>
@@ -139,23 +149,6 @@ export function Header() {
                   <X className="h-5 w-5" />
                 </Button>
               </div>
-              <div className="mt-6 flex flex-col gap-2">
-                {sections.map((s) => (
-                  <NavLink
-                    key={s.label}
-                    to={s.to}
-                    onClick={() => setMenuOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        'rounded-md px-3 py-2 text-sm',
-                        isActive ? 'text-[#a78bfa]' : 'text-[#94a3b8] hover:text-white',
-                      )
-                    }
-                  >
-                    {s.label}
-                  </NavLink>
-                ))}
-              </div>
               <div className="mt-6 border-t border-white/10 pt-4">
                 <div className="px-3 text-sm">
                   <div className="font-medium text-white">
@@ -173,6 +166,7 @@ export function Header() {
       </motion.header>
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <FavoritesDrawer open={favoritesOpen} onClose={() => setFavoritesOpen(false)} />
     </>
   )
 }

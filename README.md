@@ -1,8 +1,8 @@
-## Informações do Sistema.
+## Informações do Sistema
 
-## Links
+### Links
 
-- 🚀 **Aplicação publicada**: <https://teste-vfgomes.vercel.app>
+- 🚀 **Aplicação publicada**: <https://vfgomes-noirlux.vercel.app>
 - 🎨 **Protótipo no Figma**: <https://www.figma.com/community/file/1630765064447318545>
 
 **Contas para testar** (definidas pelo enunciado):
@@ -15,7 +15,7 @@
 Pré-requisitos: **Node.js 18+** e **npm**.
 
 ```bash
-git clone <url-do-repositorio>
+git clone <https://github.com/AlexPablo-hub/teste-vfgomes>
 cd "Tesde vfgomes"
 npm install
 ```
@@ -31,6 +31,17 @@ Scripts disponíveis (em `package.json`):
 | `npm test` | Roda a suíte Vitest uma vez (CI) |
 | `npm run test:watch` | Vitest em watch (re-roda ao salvar) |
 | `npm run test:ui` | Dashboard visual do Vitest |
+| `npm run test:e2e` | Roda a suíte **Playwright** end-to-end (sobe o build + 6 specs) |
+| `npm run test:e2e:ui` | Dashboard visual do Playwright (debug) |
+
+## CI
+
+Workflow GitHub Actions em [.github/workflows/ci.yml](.github/workflows/ci.yml) — roda em todo `push` e `pull_request` na `master`:
+
+- **Job `unit`** — type-check (`tsc -b`) → lint → Vitest (147 testes) → build de produção
+- **Job `e2e`** — depende do `unit` passar; instala Chromium + roda Playwright (specs em `e2e/`)
+
+Quando algum spec E2E falha, o report HTML é exportado como artifact `playwright-report` (mantido por 7 dias) — facilita ver screenshots e traces direto no GitHub.
 
 ## Estrutura
 
@@ -116,7 +127,7 @@ Decisões transversais:
 
 ### `/login` — [src/pages/LoginPage.tsx](src/pages/LoginPage.tsx)
 
-Porta de entrada da aplicação. Hero NOIR LUXE à esquerda, formulário à direita.
+Porta de entrada da aplicação. NOIR LUXE à esquerda, formulário à direita.
 
 | Recurso | Implementação |
 |---|---|

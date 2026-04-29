@@ -13,7 +13,7 @@ export interface Product {
   rating: ProductRating
   /** Estoque disponível — usado no admin (não existe na Fakestore API, é mock local). */
   stock?: number
-  /** Identificador interno NOIR_LUXE — derivado do id se ausente. */
+  /** Identificador interno NOIR LUXE — derivado do id se ausente. */
   sku?: string
 }
 

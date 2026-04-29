@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Heart } from 'lucide-react'
 import type { Product } from '@/types/product'
 import { useCartStore } from '@/stores/cartStore'
+import { useFavoritesStore } from '@/stores/favoritesStore'
 import { categoryLabels, type CategorySlug } from '@/data/mocks'
 import { formatBRL } from '@/lib/format'
 import { cn } from '@/lib/cn'
@@ -15,7 +16,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product, badge }: ProductCardProps) {
   const add = useCartStore((s) => s.add)
-  const [favorite, setFavorite] = useState(false)
+  const isFavorite = useFavoritesStore((s) => s.isFavorite(product.id))
+  const toggleFavorite = useFavoritesStore((s) => s.toggle)
   const [pulse, setPulse] = useState(false)
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -52,13 +54,14 @@ export function ProductCard({ product, badge }: ProductCardProps) {
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            setFavorite((f) => !f)
+            toggleFavorite(product)
           }}
-          aria-label={favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+          aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+          aria-pressed={isFavorite}
           className="absolute right-4 top-4 grid h-5 w-5 place-items-center text-white transition-colors hover:text-[#a78bfa]"
         >
           <Heart
-            className={cn('h-[18px] w-[18px] transition-all', favorite ? 'fill-[#a78bfa] text-[#a78bfa]' : '')}
+            className={cn('h-[18px] w-[18px] transition-all', isFavorite ? 'fill-[#a78bfa] text-[#a78bfa]' : '')}
           />
         </button>
       </Link>
@@ -66,7 +69,10 @@ export function ProductCard({ product, badge }: ProductCardProps) {
       <div className="flex flex-col gap-4 p-6">
         <div className="flex flex-col gap-1">
           <Link to={`/products/${product.id}`}>
-            <h3 className="line-clamp-2 text-sm font-medium leading-[19.6px] tracking-[0.28px] text-white transition-colors hover:text-[#a78bfa]">
+            {/* min-h reserva o espaço de 2 linhas (leading 19.6px × 2 = ~40px)
+                pra cards com título curto não ficarem mais baixos que os
+                de título longo, mantendo o grid alinhado. */}
+            <h3 className="line-clamp-2 min-h-[40px] text-sm font-medium leading-[19.6px] tracking-[0.28px] text-white transition-colors hover:text-[#a78bfa]">
               {product.title}
             </h3>
           </Link>

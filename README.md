@@ -10,6 +10,29 @@
 - Admin → `mor_2314` / `83r5^_` → redireciona para `/admin/estoque`
 - Cliente → `kevinryan` / `kev02937@` → redireciona para `/products`
 
+## ✨ Extras além do solicitado
+
+O enunciado pedia o básico (auth, CRUD admin, listagem + carrinho + checkout do cliente) e os 4 diferenciais (Vitest, Zustand, Figma, tratamento de erros). Tudo entregue. Acima disso, foram acrescentados estes recursos por iniciativa:
+
+| Extra | O que faz | Onde |
+|---|---|---|
+| ❤️ **Favoritos** | Wishlist completa (toggle no card, drawer próprio, mover ao carrinho), persistente e sincronizada entre abas | [favoritesStore](src/stores/favoritesStore.ts) + [FavoritesDrawer](src/components/favorites/FavoritesDrawer.tsx) |
+| 🔁 **Cross-tab sync** | Criar/editar/excluir em uma aba (admin) reflete em ~50ms em outra aba (loja) sem refresh, via evento `storage` do browser | [useCrossTabSync](src/hooks/useCrossTabSync.ts) |
+| 🔗 **URL como fonte dos filtros** | `/products?categoria=joias&ordenar=mais-avaliados` permite bookmark, share e back/forward do browser | [ProductsPage](src/pages/client/ProductsPage.tsx) |
+| ♾️ **Rolagem infinita** | IntersectionObserver com sentinel `<tr>`/`<div>`, carrega 8 por vez. Aplicado nas 3 listas (admin produtos, admin usuários, loja) | [useInfiniteScroll](src/hooks/useInfiniteScroll.ts) |
+| 🖨️ **Comprovante imprimível** | `/checkout/sucesso` tem `@media print` com fundo branco, cards sem sombra, `print:hidden` em botões/footer | [CheckoutSuccessPage](src/pages/client/CheckoutSuccessPage.tsx) |
+| 🔄 **F5 sobrevive em /checkout/sucesso** | Pedido salvo em `sessionStorage` antes do redirect; página lê do `location.state` ou cai no storage | [CheckoutPage](src/pages/client/CheckoutPage.tsx) |
+| 🎨 **Galeria de imagens no admin** | Modal secundário com grid de URLs únicas extraídas dos produtos atuais, contornando a limitação da Fakestore (não tem upload) | [AdminProductsPage](src/pages/admin/AdminProductsPage.tsx) |
+| 📱 **Máscaras BR** | Telefone (`+55 XX XXXXX-XXXX`, descarta US), CEP (`XX.XXX-XXX`), moeda (`R$ 1.500,00`) — todas progressivas e idempotentes | [lib/format.ts](src/lib/format.ts) |
+| 🚀 **App publicado** | Deploy automático na Vercel via push pra `master` + SPA fallback explícito (`vercel.json`) | <https://vfgomes-noirlux.vercel.app> |
+| 🎯 **404 estilizada** | Página dedicada com identidade NOIR LUXE, 404 gigante com glow violeta animado | [NotFoundPage](src/pages/NotFoundPage.tsx) |
+| 🪟 **Header dinâmico** | Em `/checkout/sucesso` o header global vira *minimal* (só wordmark central) pra não tentar o usuário a sair do comprovante | [Header](src/components/layout/Header.tsx) |
+| 🌐 **"Ver na loja" no admin** | Botão `<a target="_blank">` aproveita a hierarquia admin → client; admin abre a loja em nova aba sem refazer login | [AdminProductsPage](src/pages/admin/AdminProductsPage.tsx) |
+| ✅ **CI GitHub Actions** | Type-check → lint → 147 testes Vitest → build → Chromium → ~30 specs Playwright E2E em todo push | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
+| 🧪 **E2E com Playwright** | 6 specs cobrindo auth, fluxo de compra, favoritos, CRUDs admin, navegação 404 | [e2e/](e2e/) |
+| 🎭 **Document title dinâmico** | `<title>` muda por rota (admin pages, login, e por categoria em /products) | [useDocumentTitle](src/hooks/useDocumentTitle.ts) |
+| 🍞 **Sistema de toast NOIR LUXE** | 4 variantes (success/error/info/warning) com auto-dismiss e store próprio | [toastStore](src/stores/toastStore.ts) |
+
 ## Como baixar, instalar e rodar
 
 Pré-requisitos: **Node.js 18+** e **npm**.
@@ -271,33 +294,24 @@ Comprovante do pedido — também imprimível.
 
 ### Carrinho — [CartDrawer.tsx](src/components/cart/CartDrawer.tsx) + [cartStore.ts](src/stores/cartStore.ts)
 
-Carrinho persistente, acionado pelo ícone do header.
-
 | Recurso | Implementação |
 |---|---|
-| Estado | Zustand persist (`fakestore-cart`) |
-| Operações | `add` (incrementa se já existe), `increment`, `decrement` (remove em qty 1), `setQuantity`, `remove`, `clear`, `subtotal` |
-| Badge no header | `useCartStore.items.length` (produtos distintos, não soma de qty) |
-| UI | Drawer lateral 440px (full-screen mobile), `AnimatePresence` para entrada/saída suave dos itens |
-| Categoria | Vem de `categoryLabels[product.category]` (sem hardcodes mockados) |
-| Vazio | `EmptyState` com CTA "Ver Catálogo" |
+| Estado | Zustand persist (`fakestore-cart`) — `add` incrementa se já existe; `increment`, `decrement` (remove em qty 1), `setQuantity`, `remove`, `clear`, `subtotal` |
+| Badge no header | `items.length` (produtos distintos, não soma de qty) |
+| UI | Drawer lateral 440px (full-screen mobile), `AnimatePresence` para entrada/saída suave |
+| Categoria do item | `categoryLabels[product.category]` |
 | Acessibilidade | `role="dialog"`, `aria-modal`, ESC fecha, scroll-lock no body |
-| Cross-tab | Sincroniza entre abas (item adicionado em /products reflete no admin) |
-| Testes | 9 testes cobrindo add/increment/decrement/remove/setQuantity/subtotal/clear |
+| Testes | 9 unit + 4 specs E2E |
 
 ### Favoritos — [FavoritesDrawer.tsx](src/components/favorites/FavoritesDrawer.tsx) + [favoritesStore.ts](src/stores/favoritesStore.ts)
 
-Wishlist persistente, acionada pelo coração no header (extra além do enunciado).
-
 | Recurso | Implementação |
 |---|---|
-| Estado | Zustand persist (`fakestore-favorites`) — guarda `Product` inteiro, não só id |
+| Estado | Zustand persist (`fakestore-favorites`) — guarda `Product` inteiro pra que o drawer mostre nome/preço/imagem mesmo se o produto sumir do catálogo |
 | Operações | `toggle`, `isFavorite`, `remove`, `clear` |
-| Botão Mover ao carrinho | `cartStore.add(product, 1)` + toast success |
-| Coração nos cards | Conectado ao store em `ProductCard`, `RelatedCard` e `ProductDetailPage` — clicar em qualquer um sincroniza tudo |
-| Cross-tab | Idem |
-| Reset no logout | `useFavoritesStore.getState().clear()` no `AuthContext.logout()` |
-| Testes | 5 testes cobrindo toggle/isFavorite/remove/clear |
+| Sincronização do coração | Conectado ao store em `ProductCard`, `RelatedCard` e `ProductDetailPage` — clicar em qualquer um reflete em todos |
+| Mover ao carrinho | Botão dedicado no drawer dispara `cartStore.add(product, 1)` + toast |
+| Testes | 5 unit + 3 specs E2E |
 
 ## Sobre a responsividade das tabelas no admin
 
@@ -315,57 +329,24 @@ A toolbar acima da tabela (busca, filtros, atualizar) **é** totalmente responsi
 
 Trade-off consciente: cumpre 100% do requisito de "layout responsivo" para fluxos de cliente (que é o caso de uso mobile real do mini e-commerce) e prioriza usabilidade real de admin em desktop/tablet.
 
-## Produtos criados localmente aparecem na loja
+## Como o admin valida o fluxo end-to-end
 
-A Fakestore API é read-only — `POST /products` retorna um id falso e descarta o payload. Mesmo assim, o admin precisa conseguir **criar produtos** e o **cliente precisa vê-los na loja imediatamente**, mesmo em outra aba do navegador. A solução combina três peças:
+A Fakestore API é read-only — `POST /products` retorna id falso e descarta o payload. Mesmo assim, o app simula uma loja "viva":
 
-### 1. Persistência local (Zustand `persist`)
+1. **Aba A**: abrir `/admin/estoque` e clicar em **"Ver na loja"** no header — abre `/products` em **outra aba** mantendo a sessão (`<a target="_blank">`)
+2. **Aba A**: criar um produto novo (use a galeria pra escolher uma imagem)
+3. **Aba B (loja)**: o produto aparece **no grid em ~50ms**, sem refresh. Edit/delete também
+4. Carrinho e favoritos funcionam do mesmo jeito entre abas
 
-O `useProductsStore` em [src/stores/productsStore.ts](src/stores/productsStore.ts) tem o middleware `persist` configurado com a chave `fakestore-products` em `localStorage`. Toda mutação (criar/editar/excluir) escreve automaticamente nesse storage. Como `localStorage` é compartilhado entre todas as abas do mesmo `origin`, ambas (admin e loja) leem da mesma fonte de verdade.
+A combinação que torna isso possível: **Zustand `persist`** escreve em `localStorage` → **`useCrossTabSync`** ouve `storage event` e re-hidrata as outras abas → **`useHydrateProducts`** roda só uma vez por sessão pra não sobrescrever criados locais. Detalhes em cada hook/store linkado acima.
 
-### 2. Hidratação inteligente sem sobrescrever locais
+> **Limitações conscientes da Fakestore mock**: produtos criados localmente sobrevivem a refresh mas **não a logout** (reset). Edições em produtos da API são preservadas até o admin clicar em **"Atualizar"** (refetch manual sobrescreve aqueles ids — produtos puramente locais com id alto não são afetados).
 
-O hook [useHydrateProducts](src/hooks/useHydrateProducts.ts) busca da API **uma única vez por sessão** (`hydratedAt === null`). Refreshes do browser não disparam novo fetch — leem direto do `localStorage`, então um produto criado pelo admin **não some** quando a aba é recarregada.
+## Mapa de testes
 
-O reset acontece só no logout (`AuthContext.logout()` chama `useProductsStore.getState().reset()`), garantindo isolamento entre sessões.
+Duas suítes complementares: **Vitest** (147 testes em jsdom + MSW, rápido e foca em lógica/integração) e **Playwright** (~30 specs E2E em browser real, foca em fluxos completos).
 
-### 3. Cross-tab sync via `storage event`
-
-Aqui mora a parte que faz a "mágica" funcionar entre abas. Sem isso, o admin criava o produto na aba A, mas a aba B (loja) só veria depois de F5 — porque cada aba mantém uma cópia em **memória** do store que só é populada na primeira hidratação.
-
-A solução está em [src/hooks/useCrossTabSync.ts](src/hooks/useCrossTabSync.ts), montado no [App.tsx](src/App.tsx):
-
-```ts
-useEffect(() => {
-  const handler = (e: StorageEvent) => {
-    if (e.key === 'fakestore-products') {
-      void useProductsStore.persist.rehydrate()
-    }
-    // …também fakestore-users, fakestore-cart e fakestore-favorites
-  }
-  window.addEventListener('storage', handler)
-  return () => window.removeEventListener('storage', handler)
-}, [])
-```
-
-O browser dispara o evento `storage` em **todas as outras abas** (não na que escreveu) sempre que `localStorage` muda. Quando isso acontece, chamamos `useProductsStore.persist.rehydrate()`, que relê o storage e dispara re-render dos componentes inscritos. Latência percebida: ~50ms.
-
-### Como o admin testa o fluxo end-to-end
-
-1. Abrir `/admin/estoque` numa aba e clicar em **"Ver na loja"** no header — abre `/products` em nova aba mantendo a sessão (`<a target="_blank">` sem precisar passar por `/login`).
-2. Voltar à aba do admin e criar um produto novo (com imagem da galeria, por exemplo).
-3. Trocar para a aba da loja: o produto novo aparece imediatamente no grid, sem refresh.
-4. Mesma coisa vale para edit/delete: alterações refletem em tempo real entre abas.
-
-### Implicações que o admin precisa entender
-
-- **A Fakestore não persiste de verdade.** A chamada `POST /products` aparece no Network tab (cumpre o requisito de "consumir API"), mas nenhum produto criado localmente sobrevive a um logout — porque o reset zera o `localStorage`.
-- **Edits em produtos da API são preservados** localmente até logout, mas se o admin clicar em **"Atualizar"** (refresh manual) os produtos retornados pela API sobrescrevem suas edições daqueles ids. Produtos criados puramente localmente (com id alto, gerado por `Math.max(...) + 1`) não são afetados pelo refresh — o merge por username em users e o slot de id alto em products fazem o trabalho.
-- **Carrinho e favoritos também sincronizam** (`fakestore-cart`, `fakestore-favorites`) — útil pra testar o fluxo cliente em paralelo com o admin sem perder itens entre abas.
-
-## Mapa de testes (147)
-
-A suíte cobre as três fronteiras críticas: **stores** (lógica de estado), **services** (camada API) e **páginas** (integração ponta-a-ponta com MSW).
+### Vitest (147)
 
 | Arquivo | Testes | Cobre |
 |---|---:|---|
@@ -385,3 +366,14 @@ A suíte cobre as três fronteiras críticas: **stores** (lógica de estado), **
 | [src/pages/client/CheckoutPage.test.tsx](src/pages/client/CheckoutPage.test.tsx) | 4 | redirect cart vazio, validação e-mail/CEP, persistência sessionStorage |
 
 `IntersectionObserver` é stubado em [src/test/setup.ts](src/test/setup.ts) — jsdom não implementa, e o `useInfiniteScroll` precisa.
+
+### Playwright E2E (~30 specs em browser real)
+
+| Arquivo | Cobre |
+|---|---|
+| [e2e/auth.spec.ts](e2e/auth.spec.ts) | Login admin/cliente, 401 inline, validação tab×role, redirect role-based, logout, persistência F5 |
+| [e2e/client-shopping.spec.ts](e2e/client-shopping.spec.ts) | Catálogo → carrinho (add/qty/remove) → checkout (validação) → sucesso → F5 |
+| [e2e/client-favorites.spec.ts](e2e/client-favorites.spec.ts) | Toggle no card, drawer, mover ao carrinho, toggle 2x remove |
+| [e2e/admin-products.spec.ts](e2e/admin-products.spec.ts) | Criar com galeria, validação obrigatória, busca, "Ver na loja" cross-tab |
+| [e2e/admin-users.spec.ts](e2e/admin-users.spec.ts) | Criar com validação completa, e-mail, busca, filtro por papel |
+| [e2e/navigation.spec.ts](e2e/navigation.spec.ts) | 404 estilizada, URL filters, voltar do detalhe, header minimal, redirect-back seguro |

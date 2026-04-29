@@ -1,5 +1,15 @@
 ## Informações do Sistema.
 
+## Links
+
+- 🚀 **Aplicação publicada**: <https://teste-vfgomes.vercel.app>
+- 🎨 **Protótipo no Figma**: <https://www.figma.com/community/file/1630765064447318545>
+
+**Contas para testar** (definidas pelo enunciado):
+
+- Admin → `mor_2314` / `83r5^_` → redireciona para `/admin/estoque`
+- Cliente → `kevinryan` / `kev02937@` → redireciona para `/products`
+
 ## Como baixar, instalar e rodar
 
 Pré-requisitos: **Node.js 18+** e **npm**.
@@ -21,11 +31,6 @@ Scripts disponíveis (em `package.json`):
 | `npm test` | Roda a suíte Vitest uma vez (CI) |
 | `npm run test:watch` | Vitest em watch (re-roda ao salvar) |
 | `npm run test:ui` | Dashboard visual do Vitest |
-
-**Contas para testar** (como definido no enunciado):
-
-- Admin → `mor_2314` / `83r5^_` → redireciona para `/admin/estoque`
-- Cliente → `kevinryan` / `kev02937@` → redireciona para `/products`
 
 ## Estrutura
 

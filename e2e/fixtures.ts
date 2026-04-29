@@ -6,6 +6,7 @@
  */
 
 import type { Page } from '@playwright/test'
+import { mockFakestore } from './mock-api'
 
 export const ADMIN = {
   username: 'mor_2314',
@@ -51,10 +52,13 @@ export async function login(page: Page, role: 'admin' | 'client') {
 }
 
 /**
- * Limpa todo o storage local entre testes para isolar estado. Chamamos
- * antes de qualquer teste que dependa de estado fresco.
+ * Limpa todo o storage local entre testes para isolar estado E ativa o
+ * mock da Fakestore API (rotas interceptadas pelo Playwright). Chamar no
+ * `beforeEach` garante que (1) cada teste começa do zero e (2) nenhum
+ * teste depende de network externa.
  */
 export async function clearStorage(page: Page) {
+  await mockFakestore(page)
   await page.goto('/')
   await page.evaluate(() => {
     window.localStorage.clear()

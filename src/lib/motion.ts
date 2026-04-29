@@ -1,7 +1,7 @@
 import type { Variants, Transition } from 'framer-motion'
 
 /**
- * Easing padrão NOIR_LUXE — "luxury ease-out" sem overshoot.
+ * Easing padrão NOIR LUXE — "luxury ease-out" sem overshoot.
  * Equivalente ao cubic-bezier(0.16, 1, 0.3, 1) das nossas animações CSS.
  */
 export const easeLuxe: Transition['ease'] = [0.16, 1, 0.3, 1]

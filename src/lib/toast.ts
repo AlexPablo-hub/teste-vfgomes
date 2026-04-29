@@ -18,7 +18,7 @@ function show(variant: ToastVariant, title: string, options?: ToastOptions): str
 }
 
 /**
- * API de toasts NOIR_LUXE.
+ * API de toasts NOIR LUXE.
  *
  * @example
  *   toast.info('Funcionalidade em desenvolvimento')

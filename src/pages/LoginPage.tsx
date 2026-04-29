@@ -323,7 +323,7 @@ export function LoginPage() {
                 onClick={() =>
                   toast.info('Funcionalidade em desenvolvimento', {
                     description:
-                      'Em breve será possível solicitar acesso à plataforma NOIR_LUXE.',
+                      'Em breve será possível solicitar acesso à plataforma NOIR LUXE.',
                   })
                 }
                 className="font-medium text-[var(--color-foreground)] hover:underline"

@@ -15,7 +15,7 @@ interface ErrorBoundaryState {
 
 /**
  * Captura erros não tratados em qualquer descendente do React tree.
- * Exibe um fallback elegante alinhado à identidade NOIR_LUXE.
+ * Exibe um fallback elegante alinhado à identidade NOIR LUXE.
  *
  * Wrappa o RouterProvider no App.tsx — assim qualquer página renderizando
  * com erro mostra fallback em vez da tela branca.

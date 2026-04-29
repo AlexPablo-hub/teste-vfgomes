@@ -7,7 +7,7 @@
   --tracking-brand: 0.18em;
 
   /* ========================================================================
-   * NOIR_LUXE — tema único (dark luxo).
+   * NOIR LUXE — tema único (dark luxo).
    * Identidade exclusiva da marca; não há toggle light/dark.
    * Cores extraídas pixel-perfect dos designs do Figma.
    * ======================================================================== */
@@ -115,7 +115,7 @@
   /* ========================================================================
    * KEYFRAMES — primitivos de animação
    * Easing padrão: cubic-bezier(0.16, 1, 0.3, 1) — "luxury ease-out",
-   * decai suave ao final (sem overshoot, alinhado ao tom NOIR_LUXE).
+   * decai suave ao final (sem overshoot, alinhado ao tom NOIR LUXE).
    * ======================================================================== */
 
   @keyframes fade-in {

@@ -13,6 +13,8 @@ import {
   RefreshCw,
   AlertCircle,
   Star,
+  Image as ImageIcon,
+  ExternalLink,
   X,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -45,7 +47,7 @@ const emptyDraft: ProductDraft = {
   price: 0,
   description: '',
   category: productCategories[0],
-  image: '/images/coat.jpg',
+  image: '',
   stock: 10,
 }
 
@@ -74,6 +76,7 @@ export function AdminProductsPage() {
   const [search, setSearch] = useState('')
   const [refreshing, setRefreshing] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
+  const [galleryOpen, setGalleryOpen] = useState(false)
   const [filterCategory, setFilterCategory] = useState<'all' | CategorySlug>('all')
   const [filterRating, setFilterRating] = useState<'all' | '1' | '2' | '3' | '4'>('all')
   const [filterPriceMin, setFilterPriceMin] = useState('')
@@ -128,6 +131,15 @@ export function AdminProductsPage() {
     setFilterPriceMin('')
     setFilterPriceMax('')
   }
+
+  // Imagens disponíveis pra reuso no modal — extraídas dos produtos atuais
+  // (API + locais). Como não dá pra fazer upload com a Fakestore, oferecer
+  // uma galeria das URLs já existentes é a forma prática de o admin ter
+  // imagem ao criar um produto novo. Set garante únicas.
+  const availableImages = useMemo(
+    () => Array.from(new Set(products.map((p) => p.image).filter(Boolean))),
+    [products],
+  )
 
   // Reseta janela visível quando filtros/busca/ordenação mudam.
   useEffect(() => {
@@ -288,17 +300,29 @@ export function AdminProductsPage() {
             Gerencie seu catálogo de produtos e níveis de estoque
           </p>
         </div>
-        <button
-          type="button"
-          onClick={openCreate}
-          className="flex h-12 items-center gap-2 rounded-lg bg-[#7c3aed] px-6 text-base text-white transition-all hover:bg-[#6d28d9] active:scale-[0.99]"
-          style={{
-            boxShadow: '0px 10px 15px -3px rgba(124,58,237,0.2), 0px 4px 6px -4px rgba(124,58,237,0.2)',
-          }}
-        >
-          <Plus className="h-3.5 w-3.5" />
-          Adicionar Produto
-        </button>
+        <div className="flex items-center gap-3">
+          <a
+            href="/products"
+            target="_blank"
+            rel="noreferrer"
+            className="flex h-12 items-center gap-2 rounded-lg border border-white/10 px-5 text-sm font-medium tracking-[0.28px] text-[#94a3b8] transition-all hover:border-white/30 hover:bg-white/5 hover:text-white"
+            title="Abre a loja em uma nova aba mantendo a sessão"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Ver na loja
+          </a>
+          <button
+            type="button"
+            onClick={openCreate}
+            className="flex h-12 items-center gap-2 rounded-lg bg-[#7c3aed] px-6 text-base text-white transition-all hover:bg-[#6d28d9] active:scale-[0.99]"
+            style={{
+              boxShadow: '0px 10px 15px -3px rgba(124,58,237,0.2), 0px 4px 6px -4px rgba(124,58,237,0.2)',
+            }}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Adicionar Produto
+          </button>
+        </div>
       </motion.div>
 
       {/* Card com tabela */}
@@ -487,7 +511,11 @@ export function AdminProductsPage() {
                       key={p.id}
                       initial={{ opacity: 0, x: -24 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.4 + i * 0.12, duration: 0.8, ease: easeLuxe }}
+                      // Delay relativo ao índice DENTRO do batch (i % PAGE_SIZE)
+                      // e não ao absoluto, pra rolagem infinita não acumular
+                      // espera. Stagger perceptível (~0.7s entre 1ª e última
+                      // linha do batch), duration generoso pra suavidade.
+                      transition={{ delay: (i % PAGE_SIZE) * 0.09, duration: 0.7, ease: easeLuxe }}
                       className={cn(
                         'transition-colors hover:bg-white/[0.02]',
                         i > 0 && 'border-t border-white/5',
@@ -497,7 +525,7 @@ export function AdminProductsPage() {
                         <div className="grid h-12 w-12 place-items-center overflow-hidden rounded border border-white/10 bg-[#1e293b]">
                           <img
                             src={p.image}
-                            alt=""
+                            alt={p.title}
                             loading="lazy"
                             className="h-full w-full object-cover"
                           />
@@ -640,15 +668,29 @@ export function AdminProductsPage() {
             onChange={(e) => setDraft({ ...draft, sku: e.target.value })}
             placeholder="Auto-gerado se vazio"
           />
-          <Input
-            label="URL da imagem"
-            value={draft.image}
-            onChange={(e) => setDraft({ ...draft, image: e.target.value })}
-            error={errors.image}
-            containerClassName="sm:col-span-2"
-            placeholder="/images/... ou https://..."
-            required
-          />
+          <div className="flex flex-col gap-2 sm:col-span-2">
+            <Input
+              label="URL da imagem"
+              value={draft.image}
+              onChange={(e) => setDraft({ ...draft, image: e.target.value })}
+              error={errors.image}
+              placeholder="https://..."
+              required
+            />
+            {availableImages.length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setGalleryOpen(true)}
+                className="self-start"
+              >
+                <ImageIcon className="h-4 w-4" />
+                Escolher na galeria
+                <span className="text-xs opacity-70">({availableImages.length})</span>
+              </Button>
+            )}
+          </div>
           <div className="flex flex-col gap-1.5 sm:col-span-2">
             <label htmlFor="product-description" className="text-sm font-medium">
               Descrição
@@ -674,6 +716,55 @@ export function AdminProductsPage() {
         destructive
         confirmLabel={deleting ? 'Excluindo…' : 'Excluir'}
       />
+
+      <Modal
+        open={galleryOpen}
+        onClose={() => setGalleryOpen(false)}
+        title="Galeria de imagens"
+        description="Escolha uma das imagens já cadastradas no catálogo."
+        size="lg"
+        footer={
+          <Button type="button" variant="ghost" onClick={() => setGalleryOpen(false)}>
+            Fechar
+          </Button>
+        }
+      >
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+          {availableImages.map((url) => {
+            const isSelected = draft.image === url
+            return (
+              <button
+                key={url}
+                type="button"
+                onClick={() => {
+                  setDraft({ ...draft, image: url })
+                  setGalleryOpen(false)
+                }}
+                aria-label="Selecionar imagem"
+                aria-pressed={isSelected}
+                className={cn(
+                  'group relative aspect-square overflow-hidden rounded-lg border bg-white transition-all hover:scale-[1.02]',
+                  isSelected
+                    ? 'border-[#7c3aed] ring-2 ring-[#7c3aed]/40'
+                    : 'border-white/10 hover:border-white/40',
+                )}
+              >
+                <img
+                  src={url}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-contain p-2"
+                />
+                {isSelected && (
+                  <span className="absolute right-1 top-1 rounded-full bg-[#7c3aed] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    SELECIONADA
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </Modal>
 
       <Modal
         open={filterOpen}

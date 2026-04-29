@@ -7,6 +7,7 @@ import {
   Search,
   RefreshCw,
   AlertCircle,
+  ExternalLink,
 } from 'lucide-react'
 import { useUsersStore } from '@/stores/usersStore'
 import { useHydrateUsers } from '@/hooks/useHydrateUsers'
@@ -250,6 +251,16 @@ export function AdminUsersPage() {
             <RefreshCw className={cn('h-4 w-4', (hydrating || refreshing) && 'animate-spin')} />
             Atualizar
           </Button>
+          <a
+            href="/products"
+            target="_blank"
+            rel="noreferrer"
+            title="Abre a loja em uma nova aba mantendo a sessão"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--color-border)] px-4 text-sm font-medium text-[var(--color-foreground)] transition-all hover:bg-[var(--color-muted)] active:scale-[0.98]"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Ver na loja
+          </a>
           <Button onClick={openCreate}>
             <Plus className="h-4 w-4" /> Adicionar Usuário
           </Button>

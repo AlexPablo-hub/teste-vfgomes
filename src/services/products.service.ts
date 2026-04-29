@@ -6,7 +6,7 @@ import type { Product, ProductDraft } from '@/types/product'
 /**
  * Adapter: converte produto da Fakestore API para o tipo doméstico Product.
  *
- * A API não tem `stock` nem `sku` — esses campos são extensões NOIR_LUXE
+ * A API não tem `stock` nem `sku` — esses campos são extensões NOIR LUXE
  * usadas no admin. Ficam undefined ao trazer da API; o store local
  * preserva-os quando aplicáveis.
  */

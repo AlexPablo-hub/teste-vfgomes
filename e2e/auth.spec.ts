@@ -22,8 +22,8 @@ test.describe('Autenticação', () => {
   test('credenciais inválidas mostram erro 401 inline', async ({ page }) => {
     await page.goto('/login')
     await page.getByRole('tab', { name: /cliente/i }).click()
-    await page.getByLabel(/usuário/i).fill('inexistente')
-    await page.getByLabel(/senha/i).fill('errado')
+    await page.getByLabel('Usuário', { exact: true }).fill('inexistente')
+    await page.getByLabel('Senha', { exact: true }).fill('errado')
     await page.getByRole('button', { name: /entrar/i }).click()
     // Banner inline com role="alert" (validação 401)
     await expect(page.getByRole('alert')).toBeVisible({ timeout: 5_000 })
@@ -32,8 +32,8 @@ test.describe('Autenticação', () => {
   test('cliente tentando logar na tab Admin é bloqueado', async ({ page }) => {
     await page.goto('/login')
     await page.getByRole('tab', { name: /admin/i }).click()
-    await page.getByLabel(/usuário/i).fill(CLIENT.username)
-    await page.getByLabel(/senha/i).fill(CLIENT.password)
+    await page.getByLabel('Usuário', { exact: true }).fill(CLIENT.username)
+    await page.getByLabel('Senha', { exact: true }).fill(CLIENT.password)
     await page.getByRole('button', { name: /entrar/i }).click()
     // Permanece em /login (toast vermelho de role inválida)
     await page.waitForTimeout(1_000)
@@ -79,8 +79,8 @@ test.describe('Autenticação', () => {
   test('credenciais corretas — admin (smoke da fixture)', async ({ page }) => {
     await page.goto('/login')
     await page.getByRole('tab', { name: /admin/i }).click()
-    await page.getByLabel(/usuário/i).fill(ADMIN.username)
-    await page.getByLabel(/senha/i).fill(ADMIN.password)
+    await page.getByLabel('Usuário', { exact: true }).fill(ADMIN.username)
+    await page.getByLabel('Senha', { exact: true }).fill(ADMIN.password)
     await page.getByRole('button', { name: /entrar/i }).click()
     await expect(page).toHaveURL(/\/admin\/estoque$/, { timeout: 10_000 })
   })

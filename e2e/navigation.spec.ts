@@ -77,8 +77,8 @@ test.describe('Navegação geral', () => {
 
     // Loga como cliente — não pode voltar pra /admin/estoque (role inválida)
     await page.getByRole('tab', { name: /cliente/i }).click()
-    await page.getByLabel(/usuário/i).fill('kevinryan')
-    await page.getByLabel(/senha/i).fill('kev02937@')
+    await page.getByLabel('Usuário', { exact: true }).fill('kevinryan')
+    await page.getByLabel('Senha', { exact: true }).fill('kev02937@')
     await page.getByRole('button', { name: /entrar/i }).click()
 
     // Cai no fallback do role (cliente → /products), NÃO em /admin/estoque

@@ -27,8 +27,10 @@ export async function login(page: Page, role: 'admin' | 'client') {
   // Clica na tab certa antes de digitar — a validação tab×role bloqueia
   // login com role errado.
   await page.getByRole('tab', { name: role === 'admin' ? /admin/i : /cliente/i }).click()
-  await page.getByLabel(/usuário/i).fill(creds.username)
-  await page.getByLabel(/senha/i).fill(creds.password)
+  // `exact: true` porque /senha/i casa com o botão "Mostrar senha" (eye
+  // toggle do Input). Idem pra "Usuário" por consistência.
+  await page.getByLabel('Usuário', { exact: true }).fill(creds.username)
+  await page.getByLabel('Senha', { exact: true }).fill(creds.password)
   await page.getByRole('button', { name: /entrar/i }).click()
   // Espera o redirect terminar
   const expectedPath = role === 'admin' ? '/admin/estoque' : '/products'

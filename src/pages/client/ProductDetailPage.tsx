@@ -1,9 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { Heart, ShoppingCart, Check } from 'lucide-react'
+import { ArrowLeft, Heart, ShoppingCart, Check, Star } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useProductsStore } from '@/stores/productsStore'
 import { useCartStore } from '@/stores/cartStore'
+import { useFavoritesStore } from '@/stores/favoritesStore'
+import { useHydrateProducts } from '@/hooks/useHydrateProducts'
+import { categoryLabels, type CategorySlug } from '@/data/mocks'
 import { formatBRL } from '@/lib/format'
 import { formatSku } from '@/types/product'
 import { cn } from '@/lib/cn'
@@ -15,23 +18,17 @@ import {
   zoomIn,
 } from '@/lib/motion'
 
-const sizes = [38, 40, 42, 44]
-
-const techSpecs: Array<[string, string]> = [
-  ['Material do Cabedal', 'Couro Nappa Italiano de Grão Integral e Malha Técnica'],
-  ['Construção do Solado', 'Solado em TPU personalizado com haste de Fibra de Carbono'],
-  ['Forro Interno', 'Microfibra Antibacteriana e Calcanhar em Couro de Bezerro'],
-  ['Peso', '420g por pé (baseado no Tamanho 42)'],
-  ['Origem', 'Feito à mão em Marche, Itália'],
-]
-
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
   const products = useProductsStore((s) => s.products)
+  // Hidratação ainda em voo? Mostramos skeleton em vez de redirecionar
+  // pra /products quando o store está vazio na primeira carga.
+  const { loading: hydrating } = useHydrateProducts()
   const add = useCartStore((s) => s.add)
-  const [selectedSize, setSelectedSize] = useState<number>(42)
-  const [activeThumb, setActiveThumb] = useState(0)
-  const [favorite, setFavorite] = useState(false)
+  const isFavorite = useFavoritesStore((s) =>
+    id ? s.isFavorite(Number(id)) : false,
+  )
+  const toggleFavorite = useFavoritesStore((s) => s.toggle)
   const [added, setAdded] = useState(false)
 
   const product = useMemo(() => products.find((p) => p.id === Number(id)), [products, id])
@@ -40,6 +37,21 @@ export function ProductDetailPage() {
     [products, id],
   )
 
+  // Quando o usuário clica num card relacionado, o React Router só troca o
+  // `id` e re-renderiza este mesmo componente — não scrolla pro topo nem
+  // re-dispara as entradas de viewport. Isso causa: posição preservada num
+  // ponto da página antiga e cards relacionados parecendo "sumir" porque os
+  // motion.div novos herdam estado visível do parent já-renderizado.
+  // Subir a tela e usar `key={id}` no grid (abaixo) restaura a UX de "abrir
+  // um produto novo".
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [id])
+
+  // Skeleton enquanto hidrata pela primeira vez. Sem isso, acessar a URL
+  // direta com store vazio caía direto no <Navigate to="/products"> e o
+  // usuário nem chegava a ver a página.
+  if (!product && hydrating) return <ProductDetailSkeleton />
   if (!product) return <Navigate to="/products" replace />
 
   const handleAdd = () => {
@@ -48,52 +60,60 @@ export function ProductDetailPage() {
     window.setTimeout(() => setAdded(false), 1600)
   }
 
-  const titleLines = product.title.split(' ').reduce<string[]>((acc, word, i, arr) => {
-    if (arr.length <= 2) return [arr.join(' ')]
-    if (i < Math.ceil(arr.length / 2)) acc[0] = (acc[0] ?? '') + (acc[0] ? ' ' : '') + word
-    else acc[1] = (acc[1] ?? '') + (acc[1] ? ' ' : '') + word
-    return acc
-  }, [])
+  // Specs derivadas dos dados que a Fakestore realmente fornece — cada linha
+  // é uma propriedade da API + o SKU calculado.
+  const categoryLabel =
+    (categoryLabels as Record<string, string>)[product.category as CategorySlug] ?? product.category
+  const techSpecs: Array<[string, string]> = [
+    ['Categoria', categoryLabel],
+    [
+      'Avaliação',
+      `${product.rating.rate.toFixed(1)} / 5  ·  ${product.rating.count} avaliações`,
+    ],
+    [
+      'Estoque',
+      product.stock === undefined
+        ? 'Sob consulta'
+        : product.stock > 0
+        ? `${product.stock} unidades disponíveis`
+        : 'Esgotado',
+    ],
+    ['SKU', formatSku(product)],
+    ['Preço', formatBRL(product.price)],
+    ['Descrição', product.description],
+  ]
 
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-24 px-8 pb-24 pt-32">
+      {/* Botão voltar — alinhado à direita, acima da imagem */}
+      <div className="flex justify-end -mb-16">
+        <Link
+          to="/products"
+          aria-label="Voltar para a loja"
+          className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-[rgba(15,23,42,0.6)] px-4 text-sm font-medium tracking-[0.28px] text-[#94a3b8] backdrop-blur-[6px] transition-all hover:border-white/30 hover:text-white"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
+        </Link>
+      </div>
+
       {/* Hero Section */}
       <section className="grid grid-cols-1 gap-12 lg:grid-cols-[700px_1fr]">
-        {/* Imagem principal + thumbnails */}
+        {/* Imagem principal */}
         <motion.div
           variants={zoomIn}
           initial="hidden"
           animate="visible"
           className="flex flex-col gap-4"
         >
-          <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[rgba(25,31,49,0.8)] backdrop-blur-[10px]">
+          <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white">
             <div className="aspect-[700/874] w-full">
               <img
                 src={product.image}
                 alt={product.title}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain p-12"
               />
             </div>
-            <div
-              aria-hidden
-              className="absolute inset-0 bg-gradient-to-t from-[rgba(2,6,23,0.6)] to-transparent"
-            />
-          </div>
-          <div className="grid grid-cols-4 gap-4 pt-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setActiveThumb(i)}
-                aria-label={`Ver imagem ${i + 1}`}
-                className={cn(
-                  'aspect-square overflow-hidden rounded-lg border bg-[rgba(25,31,49,0.8)] backdrop-blur-[10px] transition-all',
-                  activeThumb === i ? 'border-[#7c3aed]' : 'border-transparent hover:border-white/20',
-                )}
-              >
-                <img src={product.image} alt="" className="h-full w-full object-cover" />
-              </button>
-            ))}
           </div>
         </motion.div>
 
@@ -104,13 +124,21 @@ export function ProductDetailPage() {
           animate="visible"
           className="flex flex-col"
         >
-          <motion.div variants={staggerItem} className="flex flex-col gap-2">
-            <span className="text-base uppercase tracking-[1.6px] text-[#a78bfa]">EDIÇÃO LIMITADA</span>
-            <h1 className="text-5xl font-normal uppercase leading-[48px] text-[#dce1fb]">
-              {titleLines[0]}
-              {titleLines[1] && <><br />{titleLines[1]}</>}
+          <motion.div variants={staggerItem} className="flex flex-col gap-3">
+            <span className="text-base uppercase tracking-[1.6px] text-[#a78bfa]">{categoryLabel}</span>
+            <h1 className="text-4xl font-normal leading-[48px] text-[#dce1fb]">
+              {product.title}
             </h1>
-            <div className="flex items-center gap-4 pt-2">
+            <div className="flex items-center gap-3 pt-1 text-sm text-[#94a3b8]">
+              <span className="inline-flex items-center gap-1.5">
+                <Star className="h-3.5 w-3.5 fill-[#facc15] text-[#facc15]" />
+                <span className="font-semibold text-white">{product.rating.rate.toFixed(1)}</span>
+                <span>({product.rating.count})</span>
+              </span>
+              <span aria-hidden>·</span>
+              <span>{formatSku(product)}</span>
+            </div>
+            <div className="flex items-center gap-4 pt-3">
               <span className="text-2xl font-normal leading-8 text-white">
                 {formatBRL(product.price)}
               </span>
@@ -122,43 +150,8 @@ export function ProductDetailPage() {
             </div>
           </motion.div>
 
-          <motion.p
-            variants={staggerItem}
-            className="mt-8 text-base leading-6 text-[#94a3b8]"
-          >
-            {product.description}
-          </motion.p>
-
-          {/* Tamanhos */}
-          <motion.div variants={staggerItem} className="mt-8 flex flex-col">
-            <div className="flex items-center justify-between">
-              <span className="text-base text-[#cbd5e1]">Selecionar Tamanho</span>
-              <button type="button" className="text-base text-[#a78bfa] hover:underline">
-                Guia de Tamanhos
-              </button>
-            </div>
-            <div className="mt-4 grid grid-cols-4 gap-2">
-              {sizes.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setSelectedSize(s)}
-                  aria-pressed={selectedSize === s}
-                  className={cn(
-                    'flex h-[50px] items-center justify-center rounded-lg border text-base text-[#dce1fb] backdrop-blur-[10px] transition-all',
-                    selectedSize === s
-                      ? 'border-[#7c3aed] bg-[rgba(124,58,237,0.2)]'
-                      : 'border-transparent bg-[rgba(25,31,49,0.8)] hover:border-white/20',
-                  )}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-
           {/* CTA */}
-          <motion.div variants={staggerItem} className="mt-8 flex flex-col gap-4 pt-4">
+          <motion.div variants={staggerItem} className="mt-10 flex flex-col gap-4">
             <button
               type="button"
               onClick={handleAdd}
@@ -182,22 +175,20 @@ export function ProductDetailPage() {
             </button>
             <button
               type="button"
-              onClick={() => setFavorite((f) => !f)}
+              onClick={() => toggleFavorite(product)}
+              aria-pressed={isFavorite}
               className="flex items-center justify-center gap-2 text-sm text-[#94a3b8] transition-colors hover:text-white"
             >
               <Heart
-                className={cn('h-4 w-4', favorite && 'fill-[#a78bfa] text-[#a78bfa]')}
+                className={cn('h-4 w-4', isFavorite && 'fill-[#a78bfa] text-[#a78bfa]')}
               />
-              {favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+              {isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
             </button>
-            <p className="text-center text-base tracking-[0.8px] text-[#64748b]">
-              SKU: {formatSku(product)}
-            </p>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* Especificações Técnicas */}
+      {/* Especificações Técnicas — gerada a partir dos campos da API */}
       <motion.section
         variants={revealUp}
         initial="hidden"
@@ -210,10 +201,10 @@ export function ProductDetailPage() {
           <table className="w-full text-left">
             <thead className="border-b border-white/10 bg-white/5">
               <tr>
-                <th scope="col" className="w-1/2 p-6 text-base uppercase tracking-[0.8px] text-[#94a3b8]">
+                <th scope="col" className="w-1/3 p-6 text-base uppercase tracking-[0.8px] text-[#94a3b8]">
                   ATRIBUTO
                 </th>
-                <th scope="col" className="w-1/2 p-6 text-base uppercase tracking-[0.8px] text-[#94a3b8]">
+                <th scope="col" className="p-6 text-base uppercase tracking-[0.8px] text-[#94a3b8]">
                   DETALHES
                 </th>
               </tr>
@@ -221,7 +212,7 @@ export function ProductDetailPage() {
             <tbody>
               {techSpecs.map(([k, v], i) => (
                 <tr key={k} className={cn(i < techSpecs.length - 1 && 'border-b border-white/5')}>
-                  <td className="p-6 text-base text-white">{k}</td>
+                  <td className="p-6 align-top text-base text-white">{k}</td>
                   <td className="p-6 text-base text-[#94a3b8]">{v}</td>
                 </tr>
               ))}
@@ -239,16 +230,18 @@ export function ProductDetailPage() {
         className="flex flex-col gap-8"
       >
         <div className="flex items-end justify-between">
-          <h2 className="text-base text-white">Complete o Look</h2>
+          <h2 className="text-base text-white">Complete a compra</h2>
           <Link to="/products" className="text-base text-[#a78bfa] hover:underline">
-            Ver Boutique
+            Ver Loja
           </Link>
         </div>
         <motion.div
+          // `key={id}` força remontagem do grid sempre que o produto atual
+          // muda — assim o stagger volta a animar do zero pros 4 novos cards.
+          key={id}
           variants={staggerContainer}
           initial="hidden"
-          whileInView="visible"
-          viewport={inViewport}
+          animate="visible"
           className="grid grid-cols-2 gap-6 lg:grid-cols-4"
         >
           {related.map((p) => (
@@ -267,7 +260,8 @@ function RelatedCard({
 }: {
   product: import('@/types/product').Product
 }) {
-  const [fav, setFav] = useState(false)
+  const isFavorite = useFavoritesStore((s) => s.isFavorite(product.id))
+  const toggleFavorite = useFavoritesStore((s) => s.toggle)
   return (
     <Link
       to={`/products/${product.id}`}
@@ -281,23 +275,54 @@ function RelatedCard({
           className="h-[252px] w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
-      <h3 className="text-base text-white">{product.title}</h3>
+      {/* min-h reserva o espaço de 2 linhas (text-base × leading default = 24px × 2 = 48px)
+          pra cards com título curto não ficarem mais baixos no grid. */}
+      <h3 className="line-clamp-2 min-h-[48px] text-base text-white">{product.title}</h3>
       <p className="pb-3 text-base text-[#64748b]">{formatSku(product)}</p>
-      <div className="flex items-center justify-between">
+      <div className="mt-auto flex items-center justify-between">
         <span className="text-base text-[#a78bfa]">{formatBRL(product.price)}</span>
         <button
           type="button"
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            setFav((f) => !f)
+            toggleFavorite(product)
           }}
-          aria-label={fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+          aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+          aria-pressed={isFavorite}
           className="text-white hover:text-[#a78bfa]"
         >
-          <Heart className={cn('h-[18px] w-5', fav && 'fill-[#a78bfa] text-[#a78bfa]')} />
+          <Heart className={cn('h-[18px] w-5', isFavorite && 'fill-[#a78bfa] text-[#a78bfa]')} />
         </button>
       </div>
     </Link>
+  )
+}
+
+function ProductDetailSkeleton() {
+  return (
+    <div
+      aria-busy
+      aria-label="Carregando produto"
+      className="mx-auto flex max-w-[1280px] flex-col gap-24 px-8 pb-24 pt-32"
+    >
+      <section className="grid grid-cols-1 gap-12 lg:grid-cols-[700px_1fr]">
+        {/* Imagem */}
+        <div className="aspect-[700/874] w-full animate-pulse rounded-xl border border-white/10 bg-[rgba(25,31,49,0.5)]" />
+        {/* Detalhes */}
+        <div className="flex flex-col gap-4">
+          <div className="h-4 w-32 animate-pulse rounded bg-white/10" />
+          <div className="h-12 w-full animate-pulse rounded bg-white/10" />
+          <div className="h-12 w-3/4 animate-pulse rounded bg-white/10" />
+          <div className="mt-4 h-8 w-40 animate-pulse rounded bg-white/10" />
+          <div className="mt-8 h-16 w-full animate-pulse rounded-lg bg-white/10" />
+          <div className="h-4 w-48 animate-pulse rounded bg-white/5" />
+        </div>
+      </section>
+      <section className="flex flex-col gap-6">
+        <div className="h-5 w-56 animate-pulse rounded bg-white/10" />
+        <div className="h-72 w-full animate-pulse rounded-xl border border-white/10 bg-[rgba(25,31,49,0.5)]" />
+      </section>
+    </div>
   )
 }

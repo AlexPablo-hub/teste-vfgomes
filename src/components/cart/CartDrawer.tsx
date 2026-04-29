@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Lock, Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCartStore } from '@/stores/cartStore'
+import { categoryLabels, type CategorySlug } from '@/data/mocks'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { formatBRL } from '@/lib/format'
 import { easeLuxe } from '@/lib/motion'
@@ -11,13 +12,6 @@ import { easeLuxe } from '@/lib/motion'
 interface CartDrawerProps {
   open: boolean
   onClose: () => void
-}
-
-const itemMeta: Record<number, string> = {
-  // ID -> meta (tamanho/cor) — placeholder; numa versão real, viria do produto
-  5: 'TAMANHO: 42 • PRETO',
-  12: 'TAMANHO: 42 • PRETO',
-  6: 'UNISSEX • VIOLETA',
 }
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
@@ -76,7 +70,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             <EmptyState
               icon={<ShoppingBag className="h-6 w-6" />}
               title="Seu carrinho está vazio"
-              description="Explore o catálogo NOIR_LUXE para começar."
+              description="Explore o catálogo NOIR LUXE para começar."
               action={
                 <Link
                   to="/products"
@@ -127,7 +121,9 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                         </button>
                       </div>
                       <p className="text-xs uppercase tracking-wider text-[#64748b]">
-                        {itemMeta[item.product.id] ?? 'EDIÇÃO NOIR_LUXE'}
+                        {(categoryLabels as Record<string, string>)[
+                          item.product.category as CategorySlug
+                        ] ?? 'EDIÇÃO NOIR LUXE'}
                       </p>
                     </div>
 

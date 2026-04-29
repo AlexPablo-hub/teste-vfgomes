@@ -11,6 +11,8 @@ interface CartSummaryProps {
   ctaLabel?: string
   onCheckout?: () => void
   disabled?: boolean
+  /** Esconde o botão de CTA — útil quando o pai já tem seu próprio submit. */
+  hideCta?: boolean
 }
 
 export function CartSummary({
@@ -21,6 +23,7 @@ export function CartSummary({
   ctaLabel = 'Finalizar compra',
   onCheckout,
   disabled,
+  hideCta,
 }: CartSummaryProps) {
   const total = subtotal + (subtotal > 0 ? shipping : 0)
   const isDisabled = disabled || itemCount === 0
@@ -43,7 +46,7 @@ export function CartSummary({
         </div>
         {subtotal > 0 && shipping === 0 && (
           <p className="rounded-md bg-[var(--color-success)]/15 px-2 py-1.5 text-xs text-[var(--color-success)]">
-            Você ganhou frete grátis 🎉
+            Você ganhou frete grátis 
           </p>
         )}
         <div className="border-t border-[var(--color-border)] pt-3">
@@ -54,7 +57,7 @@ export function CartSummary({
         </div>
       </dl>
 
-      {ctaTo && !isDisabled ? (
+      {hideCta ? null : ctaTo && !isDisabled ? (
         <Link
           to={ctaTo}
           className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-6 text-base font-medium text-[var(--color-primary-foreground)] shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"

@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { CartSummary } from '@/components/cart/CartSummary'
+import { maskCEP, isValidEmail } from '@/lib/format'
+import { toast } from '@/lib/toast'
 
 type PaymentMethod = 'credit' | 'pix' | 'boleto'
 
@@ -31,6 +33,7 @@ export function CheckoutPage() {
   const navigate = useNavigate()
 
   const [submitting, setSubmitting] = useState(false)
+  const [emailError, setEmailError] = useState<string | undefined>()
 
   const [name, setName] = useState(user ? `${user.name.firstname} ${user.name.lastname}` : '')
   const [email, setEmail] = useState(user?.email ?? '')
@@ -50,6 +53,12 @@ export function CheckoutPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    if (!isValidEmail(email)) {
+      setEmailError('E-mail inválido (ex: nome@dominio.com).')
+      toast.error('Verifique os dados antes de confirmar o pedido.')
+      return
+    }
+    setEmailError(undefined)
     setSubmitting(true)
     await new Promise((r) => setTimeout(r, 800))
     const orderState = {
@@ -84,7 +93,7 @@ export function CheckoutPage() {
             </header>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="Nome completo" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />
-              <Input label="E-mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+              <Input label="E-mail" type="email" value={email} onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError(undefined) }} error={emailError} placeholder="ex: nome@dominio.com" required autoComplete="email" />
             </div>
           </section>
 
@@ -94,7 +103,7 @@ export function CheckoutPage() {
               <h2 className="font-semibold">Endereço de entrega</h2>
             </header>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-6">
-              <Input label="CEP" value={zipcode} onChange={(e) => setZipcode(e.target.value)} placeholder="00000-000" required autoComplete="postal-code" containerClassName="sm:col-span-2" />
+              <Input label="CEP" value={maskCEP(zipcode)} onChange={(e) => setZipcode(maskCEP(e.target.value))} placeholder="ex: 12.345-678" required autoComplete="postal-code" inputMode="numeric" containerClassName="sm:col-span-2" />
               <Input label="Rua" value={street} onChange={(e) => setStreet(e.target.value)} required autoComplete="street-address" containerClassName="sm:col-span-3" />
               <Input label="Número" value={number} onChange={(e) => setNumber(e.target.value)} required inputMode="numeric" containerClassName="sm:col-span-1" />
               <Input label="Cidade" value={city} onChange={(e) => setCity(e.target.value)} required autoComplete="address-level2" containerClassName="sm:col-span-6" />

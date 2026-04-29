@@ -25,10 +25,10 @@ describe('mocks data', () => {
   })
 
   it('getCategoryLabel devolve label conhecida', () => {
-    expect(getCategoryLabel('electronics')).toBe('Relógios')
-    expect(getCategoryLabel('jewelery')).toBe('Fragrâncias')
-    expect(getCategoryLabel("men's clothing")).toBe('Casacos')
-    expect(getCategoryLabel("women's clothing")).toBe('Calçados')
+    expect(getCategoryLabel('electronics')).toBe('Eletrônicos')
+    expect(getCategoryLabel('jewelery')).toBe('Joias')
+    expect(getCategoryLabel("men's clothing")).toBe('Roupas masculinas')
+    expect(getCategoryLabel("women's clothing")).toBe('Roupas femininas')
   })
 
   it('getCategoryLabel devolve o slug se não conhecido (fallback)', () => {

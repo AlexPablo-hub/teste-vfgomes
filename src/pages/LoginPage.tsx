@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight, Eye, EyeOff, Loader2, Lock, User as UserIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
+import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { toast } from '@/lib/toast'
 import { cn } from '@/lib/cn'
 import { staggerContainer, staggerItem } from '@/lib/motion'
@@ -26,6 +27,9 @@ export function LoginPage() {
   // achar o campo errado; cursor já vai pra ele).
   const usernameRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
+
+  // Título da aba reage à tab selecionada
+  useDocumentTitle(`Login - ${tab === 'admin' ? 'Administrador' : 'Cliente'}`)
 
   if (isAuthenticated && role) {
     return <Navigate to={ROLE_HOME[role]} replace />

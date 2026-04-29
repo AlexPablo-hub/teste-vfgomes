@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard,
   Package,
   Users as UsersIcon,
   Settings,
@@ -14,6 +13,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
+import { toast } from '@/lib/toast'
 import { slideInLeft, slideDown } from '@/lib/motion'
 
 interface NavItem {
@@ -24,7 +24,6 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { to: '/admin/painel', label: 'PAINEL', icon: LayoutDashboard },
   {
     to: '/admin/estoque',
     label: 'ESTOQUE',
@@ -45,7 +44,6 @@ const breadcrumbLabels: Record<string, string> = {
   products: 'estoque',
   clientes: 'clientes',
   users: 'clientes',
-  painel: 'painel',
 }
 
 export function AdminLayout() {
@@ -68,7 +66,7 @@ export function AdminLayout() {
         <h1 className="text-lg font-bold uppercase tracking-[1.8px] leading-7 text-white">ADMIN</h1>
       </div>
 
-      {/* Nav */}
+      {/* Nav principal — só ESTOQUE e CLIENTES */}
       <nav className="flex flex-1 flex-col gap-1">
         {navItems.map(({ to, label, icon: Icon, matchPaths }) => {
           const isActive = matchPaths
@@ -93,14 +91,20 @@ export function AdminLayout() {
         })}
       </nav>
 
-      {/* Bottom */}
+      {/* Footer da sidebar — Settings e Sign Out fixos no rodapé */}
       <div className="border-t border-white/10 pt-6">
         <button
           type="button"
+          onClick={() =>
+            toast.info('Funcionalidade em desenvolvimento', {
+              description:
+                'Em breve você poderá ajustar preferências da plataforma.',
+            })
+          }
           className="flex w-full items-center gap-3 px-4 py-3 text-xs font-medium uppercase tracking-[1.2px] leading-4 text-[#64748b] hover:bg-white/5 hover:text-white"
         >
           <Settings className="h-5 w-5" />
-          SETTINGS
+          CONFIGURAÇÕES
         </button>
         <button
           type="button"
@@ -108,26 +112,27 @@ export function AdminLayout() {
           className="flex w-full items-center gap-3 px-4 py-3 text-xs font-medium uppercase tracking-[1.2px] leading-4 text-[#64748b] hover:bg-white/5 hover:text-[#f87171]"
         >
           <LogOut className="h-[18px] w-[18px]" />
-          SIGN OUT
+          SAIR
         </button>
       </div>
     </div>
   )
 
   return (
-    <div className="flex min-h-screen bg-[#0c1324]">
-      {/* Sidebar desktop */}
+    <div className="min-h-screen bg-[#0c1324]">
+      {/* Sidebar desktop — FIXO na lateral, ocupa altura total da viewport.
+          Não afeta o flow do main porque está fora do flex (position: fixed). */}
       <motion.aside
         variants={slideInLeft}
         initial="hidden"
         animate="visible"
-        className="hidden w-64 shrink-0 border-r border-white/10 bg-[rgba(15,23,42,0.9)] backdrop-blur-[8px] lg:block"
+        className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-white/10 bg-[rgba(15,23,42,0.9)] backdrop-blur-[8px] lg:block"
         style={{ boxShadow: '4px 0px 24px 0px rgba(0,0,0,0.5)' }}
       >
         {sidebarContent}
       </motion.aside>
 
-      {/* Sidebar mobile */}
+      {/* Sidebar mobile (drawer) */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} aria-hidden />
@@ -142,14 +147,15 @@ export function AdminLayout() {
         </div>
       )}
 
-      {/* Conteúdo */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Top header com breadcrumb + profile */}
+      {/* Conteúdo principal — desloca à direita do sidebar fixo em desktop. */}
+      <div className="flex min-h-screen min-w-0 flex-col lg:ml-64">
+        {/* Top header — h-20 com mais respiro vertical (era h-12, ficando do
+            mesmo tamanho do profile pill — agora fica visualmente confortável) */}
         <motion.header
           variants={slideDown}
           initial="hidden"
           animate="visible"
-          className="sticky top-0 z-20 flex h-12 items-center justify-between gap-3 border-b border-white/10 bg-[rgba(2,6,23,0.8)] px-8 backdrop-blur-[12px]"
+          className="sticky top-0 z-20 flex h-20 items-center justify-between gap-3 border-b border-white/10 bg-[rgba(2,6,23,0.8)] px-8 backdrop-blur-[12px]"
         >
           <div className="flex items-center gap-3">
             <Button
@@ -205,32 +211,19 @@ export function AdminLayout() {
           <Outlet />
         </main>
 
-        <footer className="border-t border-white/5 bg-[#020617] px-8 py-12">
-          <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+        {/* Footer fino — py-4 (32px). Comportamento natural de flex column:
+            quando o conteúdo é curto, fica grudado no fim da viewport via
+            flex-1 do main. Quando há scroll, aparece ao rolar até o fim. */}
+        <footer className="border-t border-white/5 bg-[#020617] px-8 py-4">
+          <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
             <p className="text-xs leading-4 text-[#64748b]">
-              © {new Date().getFullYear()} NOIR_LUXE. All rights reserved.
+              © {new Date().getFullYear()} NOIR LUXE. All rights reserved.
             </p>
-            <ul className="flex gap-x-8">
-              <li>
-                <a href="#" className="text-xs text-[#475569] hover:text-white">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-xs text-[#475569] hover:text-white">
-                  Terms of Service
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-xs text-[#475569] hover:text-white">
-                  Shipping
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-xs text-[#475569] hover:text-white">
-                  Returns
-                </a>
-              </li>
+            <ul className="flex gap-x-6">
+              <li><a href="#" className="text-xs text-[#475569] hover:text-white">Privacy Policy</a></li>
+              <li><a href="#" className="text-xs text-[#475569] hover:text-white">Terms of Service</a></li>
+              <li><a href="#" className="text-xs text-[#475569] hover:text-white">Shipping</a></li>
+              <li><a href="#" className="text-xs text-[#475569] hover:text-white">Returns</a></li>
             </ul>
           </div>
         </footer>

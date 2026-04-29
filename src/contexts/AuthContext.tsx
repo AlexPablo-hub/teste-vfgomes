@@ -3,6 +3,9 @@ import * as authService from '@/services/auth.service'
 import { AuthError, NetworkError } from '@/lib/errors'
 import { toast } from '@/lib/toast'
 import type { AuthUser, Role } from '@/types/user'
+import { useUsersStore } from '@/stores/usersStore'
+import { useProductsStore } from '@/stores/productsStore'
+import { useCartStore } from '@/stores/cartStore'
 
 interface AuthContextValue {
   user: AuthUser | null
@@ -63,6 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     authService.logout()
     setUser(null)
+    // Limpa contexto local: usuários/produtos voltam aos mocks iniciais e
+    // hydratedAt zera, permitindo hidratação fresca no próximo login.
+    // Carrinho zera para não vazar entre contas.
+    useUsersStore.getState().reset()
+    useProductsStore.getState().reset()
+    useCartStore.getState().clear()
   }, [])
 
   const value = useMemo<AuthContextValue>(

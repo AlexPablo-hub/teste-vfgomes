@@ -8,8 +8,8 @@ import type { User } from '@/types/user'
  * (electronics, jewelery, men's clothing, women's clothing) para que a
  * integração com a API real funcione sem camada de tradução.
  *
- * O mapa `categoryLabels` traduz os slugs para os labels visuais NOIR_LUXE
- * que aparecem na UI (Relógios / Fragrâncias / Casacos / Calçados).
+ * O mapa `categoryLabels` traduz os slugs para PT-BR semanticamente correto
+ * (Eletrônicos / Joias / Roupas masculinas / Roupas femininas).
  */
 export const mockProducts: Product[] = [
   {
@@ -171,16 +171,12 @@ export const productCategories = [
 
 export type CategorySlug = (typeof productCategories)[number]
 
-/**
- * Map slug → label visível NOIR_LUXE. Os labels foram escolhidos para
- * manter a identidade luxo do Figma (Casacos, Calçados, Relógios, Fragrâncias)
- * mesmo que o slug subjacente seja o da Fakestore.
- */
+/** Map slug Fakestore → label PT-BR semanticamente correto. */
 export const categoryLabels: Record<CategorySlug, string> = {
-  electronics: 'Relógios',
-  jewelery: 'Fragrâncias',
-  "men's clothing": 'Casacos',
-  "women's clothing": 'Calçados',
+  electronics: 'Eletrônicos',
+  jewelery: 'Joias',
+  "men's clothing": 'Roupas masculinas',
+  "women's clothing": 'Roupas femininas',
 }
 
 /** Retorna o label PT-BR para um slug, ou o próprio slug se não for um dos 4. */

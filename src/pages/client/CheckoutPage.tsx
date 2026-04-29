@@ -65,7 +65,10 @@ export function CheckoutPage() {
 
   const [name, setName] = useState(user ? `${user.name.firstname} ${user.name.lastname}` : '')
   const [email, setEmail] = useState(user?.email ?? '')
-  const [zipcode, setZipcode] = useState(user?.address.zipcode ?? '')
+  // CEP normalizado via maskCEP no init — a Fakestore às vezes traz ZIP+4
+  // americano (9 dígitos, ex: '29567-1452') que falharia na validação de
+  // 8 dígitos. maskCEP trunca pros 8 corretos no formato XX.XXX-XXX.
+  const [zipcode, setZipcode] = useState(maskCEP(user?.address.zipcode ?? ''))
   const [street, setStreet] = useState(user?.address.street ?? '')
   const [number, setNumber] = useState(String(user?.address.number ?? ''))
   const [city, setCity] = useState(user?.address.city ?? '')

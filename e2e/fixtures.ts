@@ -55,16 +55,22 @@ export async function login(page: Page, role: 'admin' | 'client') {
  * Limpa todo o storage local entre testes para isolar estado E ativa o
  * mock da Fakestore API (rotas interceptadas pelo Playwright).
  *
- * Sequência: `goto('/login')` direto (rota não-autenticada, evita o
- * RootRedirect ler localStorage durante o init e disparar redirect
- * indesejado). Depois `evaluate` limpa storage. Por fim, `reload` faz a
- * página subir já com storage zerado.
+ * Sequência crítica:
+ *  1. mockFakestore — registra rotas interceptadas
+ *  2. clearCookies do contexto
+ *  3. goto('/login') — rota pública, não dispara RootRedirect
+ *  4. evaluate clear storage — limpa localStorage/sessionStorage
+ *  5. reload — força AuthContext re-init com storage 100% vazio
+ *     (sem isso, o useState init do AuthProvider já tinha lido o storage
+ *     da sessão anterior e ficava com user fantasma em memória)
  */
 export async function clearStorage(page: Page) {
   await mockFakestore(page)
+  await page.context().clearCookies()
   await page.goto('/login', { waitUntil: 'domcontentloaded' })
   await page.evaluate(() => {
     window.localStorage.clear()
     window.sessionStorage.clear()
   })
+  await page.reload({ waitUntil: 'domcontentloaded' })
 }

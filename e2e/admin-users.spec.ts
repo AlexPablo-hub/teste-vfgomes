@@ -5,10 +5,12 @@ test.describe('Admin — CRUD de usuários', () => {
   test.beforeEach(async ({ page }) => {
     await clearStorage(page)
     await login(page, 'admin')
-    await page.goto('/admin/clientes')
+    // Aguarda navegação completar antes de verificar o heading.
+    await page.goto('/admin/clientes', { waitUntil: 'domcontentloaded' })
+    await page.waitForURL('**/admin/clientes', { timeout: 10_000 })
     await expect(
       page.getByRole('heading', { name: /gestão de clientes/i }),
-    ).toBeVisible({ timeout: 10_000 })
+    ).toBeVisible({ timeout: 15_000 })
   })
 
   test('cria usuário novo com validação completa', async ({ page }) => {

@@ -7,12 +7,12 @@ test.describe('Admin — CRUD de produtos', () => {
     await login(page, 'admin')
     // Espera a tabela hidratar
     await expect(
-      page.getByRole('button', { name: /adicionar produto/i }),
+      page.getByRole('button', { name: 'Adicionar Produto', exact: true }).first(),
     ).toBeVisible({ timeout: 10_000 })
   })
 
   test('cria produto novo escolhendo imagem da galeria', async ({ page }) => {
-    await page.getByRole('button', { name: /adicionar produto/i }).click()
+    await page.getByRole('button', { name: 'Adicionar Produto', exact: true }).first().click()
     const modal = page.getByRole('heading', { name: /novo produto/i })
     await expect(modal).toBeVisible()
 
@@ -42,7 +42,7 @@ test.describe('Admin — CRUD de produtos', () => {
   })
 
   test('rejeita criar produto com campos obrigatórios vazios', async ({ page }) => {
-    await page.getByRole('button', { name: /adicionar produto/i }).click()
+    await page.getByRole('button', { name: 'Adicionar Produto', exact: true }).first().click()
     await page.getByRole('button', { name: /criar produto/i }).click()
     // Erros inline aparecem (título/imagem/descrição/preço)
     await expect(page.getByText(/informe o título/i)).toBeVisible({ timeout: 3_000 })

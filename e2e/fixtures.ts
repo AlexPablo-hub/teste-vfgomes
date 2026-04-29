@@ -53,13 +53,16 @@ export async function login(page: Page, role: 'admin' | 'client') {
 
 /**
  * Limpa todo o storage local entre testes para isolar estado E ativa o
- * mock da Fakestore API (rotas interceptadas pelo Playwright). Chamar no
- * `beforeEach` garante que (1) cada teste começa do zero e (2) nenhum
- * teste depende de network externa.
+ * mock da Fakestore API (rotas interceptadas pelo Playwright).
+ *
+ * Sequência: `goto('/login')` direto (rota não-autenticada, evita o
+ * RootRedirect ler localStorage durante o init e disparar redirect
+ * indesejado). Depois `evaluate` limpa storage. Por fim, `reload` faz a
+ * página subir já com storage zerado.
  */
 export async function clearStorage(page: Page) {
   await mockFakestore(page)
-  await page.goto('/')
+  await page.goto('/login', { waitUntil: 'domcontentloaded' })
   await page.evaluate(() => {
     window.localStorage.clear()
     window.sessionStorage.clear()

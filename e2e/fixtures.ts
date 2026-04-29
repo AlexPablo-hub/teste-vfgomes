@@ -23,18 +23,31 @@ export const CLIENT = {
  */
 export async function login(page: Page, role: 'admin' | 'client') {
   const creds = role === 'admin' ? ADMIN : CLIENT
-  await page.goto('/login')
+  await page.goto('/login', { waitUntil: 'domcontentloaded' })
+
+  // Espera os inputs estarem visíveis (Framer Motion stagger pode atrasar
+  // a montagem; sem isso o .fill() pode rodar antes da animação terminar).
+  const userInput = page.getByLabel('Usuário', { exact: true })
+  const passInput = page.getByLabel('Senha', { exact: true })
+  await userInput.waitFor({ state: 'visible', timeout: 10_000 })
+
   // Clica na tab certa antes de digitar — a validação tab×role bloqueia
-  // login com role errado.
-  await page.getByRole('tab', { name: role === 'admin' ? /admin/i : /cliente/i }).click()
-  // `exact: true` porque /senha/i casa com o botão "Mostrar senha" (eye
-  // toggle do Input). Idem pra "Usuário" por consistência.
-  await page.getByLabel('Usuário', { exact: true }).fill(creds.username)
-  await page.getByLabel('Senha', { exact: true }).fill(creds.password)
-  await page.getByRole('button', { name: /entrar/i }).click()
-  // Espera o redirect terminar
+  // login com role errado. Texto exato evita conflito com "Administrador"
+  // casando com outras palavras.
+  const tabName = role === 'admin' ? 'Administrador' : 'Cliente'
+  await page.getByRole('tab', { name: tabName }).click()
+
+  await userInput.fill(creds.username)
+  await passInput.fill(creds.password)
+
+  // O botão tem texto "Entrar" + ícone — name=/^entrar$/i evita confusão
+  // com possíveis "Entrar com…" ou outros textos que comecem com "entrar".
+  await page.getByRole('button', { name: /^entrar/i }).click()
+
+  // Espera o redirect terminar — timeout generoso porque o submit faz POST
+  // /auth/login + GET /users na Fakestore real (latência variável em CI).
   const expectedPath = role === 'admin' ? '/admin/estoque' : '/products'
-  await page.waitForURL(`**${expectedPath}`, { timeout: 10_000 })
+  await page.waitForURL(`**${expectedPath}`, { timeout: 30_000 })
 }
 
 /**

@@ -76,7 +76,7 @@ test.describe('Navegação geral', () => {
     await expect(page).toHaveURL(/\/login/, { timeout: 5_000 })
 
     // Loga como cliente — não pode voltar pra /admin/estoque (role inválida)
-    await page.getByRole('tab', { name: /cliente/i }).click()
+    await page.getByRole('tab', { name: 'Cliente' }).click()
     await page.getByLabel('Usuário', { exact: true }).fill('kevinryan')
     await page.getByLabel('Senha', { exact: true }).fill('kev02937@')
     await page.getByRole('button', { name: /entrar/i }).click()

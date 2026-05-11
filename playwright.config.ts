@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test'
  * - `webServer` faz `npm run preview` (Vite serve o build de produção em :4173).
  *   Pra rodar local sem build prévio, basta `npm run build` antes ou usar
  *   `reuseExistingServer` rodando `npm run dev` numa aba e disparar os testes.
- * - 1 projeto chromium-only — suficiente pro escopo do teste técnico, e o
+ * - 1 projeto chromium-only — suficiente para o escopo do projeto, e o
  *   CI fica mais rápido (não precisa baixar Firefox/WebKit).
  * - Em CI: 2 retries, sem `forbidOnly`, screenshots/videos só em falha.
  */

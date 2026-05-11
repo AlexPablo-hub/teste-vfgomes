@@ -1,8 +1,8 @@
 /**
  * Fixtures e helpers compartilhados pelos testes E2E.
  *
- * As credenciais aqui são as exigidas pelo enunciado do teste técnico —
- * a Fakestore API as fornece via GET /users (sem real persistência).
+ * As credenciais aqui são as que a Fakestore API expõe via GET /users
+ * (sem real persistência) — usadas como seed para os dois perfis.
  */
 
 import type { Page } from '@playwright/test'

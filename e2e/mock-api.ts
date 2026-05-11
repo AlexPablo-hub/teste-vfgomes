@@ -7,7 +7,7 @@ import type { Page } from '@playwright/test'
  * e os testes ficam flaky.
  *
  * As respostas seguem o formato real da Fakestore (atestado pelo MSW dos
- * testes Vitest) — incluindo as 2 contas obrigatórias do enunciado.
+ * testes Vitest) — incluindo as 2 contas usadas para os perfis admin/cliente.
  *
  * Uso:
  *   test.beforeEach(async ({ page }) => {

@@ -49,7 +49,7 @@ test.describe('Admin — CRUD de usuários', () => {
 
   test('busca filtra por nome/email/username', async ({ page }) => {
     const search = page.getByPlaceholder(/buscar por nome/i)
-    // Mor_2314 é uma das 2 contas obrigatórias do enunciado — deve estar na lista
+    // mor_2314 é uma das contas seed (perfil admin) — deve estar na lista
     await search.fill('mor_2314')
     await expect(page.getByText(/mor_2314/i).first()).toBeVisible({ timeout: 5_000 })
   })

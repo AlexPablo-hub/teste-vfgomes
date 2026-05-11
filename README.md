@@ -2,17 +2,17 @@
 
 ### Links
 
-- 🚀 **Aplicação publicada**: <https://vfgomes-noirlux.vercel.app>
+- 🚀 **Aplicação publicada**: <https://noirlux-ecommerce.vercel.app>
 - 🎨 **Protótipo no Figma**: <https://www.figma.com/community/file/1630765064447318545>
 
-**Contas para testar** (definidas pelo enunciado):
+**Contas para testar** (definidas no escopo):
 
 - Admin → `mor_2314` / `83r5^_` → redireciona para `/admin/estoque`
 - Cliente → `kevinryan` / `kev02937@` → redireciona para `/products`
 
 ## ✨ Extras além do solicitado
 
-O enunciado pedia o básico (auth, CRUD admin, listagem + carrinho + checkout do cliente) e os 4 diferenciais (Vitest, Zustand, Figma, tratamento de erros). Tudo entregue. Acima disso, foram acrescentados estes recursos por iniciativa:
+O escopo inicial cobria o básico (auth, CRUD admin, listagem + carrinho + checkout do cliente) e 4 diferenciais técnicos (Vitest, Zustand, Figma, tratamento de erros). Tudo entregue. Acima disso, foram acrescentados estes recursos por iniciativa:
 
 | Extra | O que faz | Onde |
 |---|---|---|
@@ -24,7 +24,7 @@ O enunciado pedia o básico (auth, CRUD admin, listagem + carrinho + checkout do
 | 🔄 **F5 sobrevive em /checkout/sucesso** | Pedido salvo em `sessionStorage` antes do redirect; página lê do `location.state` ou cai no storage | [CheckoutPage](src/pages/client/CheckoutPage.tsx) |
 | 🎨 **Galeria de imagens no admin** | Modal secundário com grid de URLs únicas extraídas dos produtos atuais, contornando a limitação da Fakestore (não tem upload) | [AdminProductsPage](src/pages/admin/AdminProductsPage.tsx) |
 | 📱 **Máscaras BR** | Telefone (`+55 XX XXXXX-XXXX`, descarta US), CEP (`XX.XXX-XXX`), moeda (`R$ 1.500,00`) — todas progressivas e idempotentes | [lib/format.ts](src/lib/format.ts) |
-| 🚀 **App publicado** | Deploy automático na Vercel via push pra `master` + SPA fallback explícito (`vercel.json`) | <https://vfgomes-noirlux.vercel.app> |
+| 🚀 **App publicado** | Deploy automático na Vercel via push pra `master` + SPA fallback explícito (`vercel.json`) | <https://noirlux-ecommerce.vercel.app> |
 | 🎯 **404 estilizada** | Página dedicada com identidade NOIR LUXE, 404 gigante com glow violeta animado | [NotFoundPage](src/pages/NotFoundPage.tsx) |
 | 🪟 **Header dinâmico** | Em `/checkout/sucesso` o header global vira *minimal* (só wordmark central) pra não tentar o usuário a sair do comprovante | [Header](src/components/layout/Header.tsx) |
 | 🌐 **"Ver na loja" no admin** | Botão `<a target="_blank">` aproveita a hierarquia admin → client; admin abre a loja em nova aba sem refazer login | [AdminProductsPage](src/pages/admin/AdminProductsPage.tsx) |
@@ -38,8 +38,8 @@ O enunciado pedia o básico (auth, CRUD admin, listagem + carrinho + checkout do
 Pré-requisitos: **Node.js 18+** e **npm**.
 
 ```bash
-git clone <https://github.com/AlexPablo-hub/teste-vfgomes>
-cd "Tesde vfgomes"
+git clone https://github.com/AlexPablo-hub/noirlux-ecommerce
+cd noirlux-ecommerce
 npm install
 ```
 

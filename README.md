@@ -378,3 +378,12 @@ Duas suítes complementares: **Vitest** (147 testes em jsdom + MSW, rápido e fo
 | [e2e/admin-products.spec.ts](e2e/admin-products.spec.ts) | Criar com galeria, validação obrigatória, busca, "Ver na loja" cross-tab |
 | [e2e/admin-users.spec.ts](e2e/admin-users.spec.ts) | Criar com validação completa, e-mail, busca, filtro por papel |
 | [e2e/navigation.spec.ts](e2e/navigation.spec.ts) | 404 estilizada, URL filters, voltar do detalhe, header minimal, redirect-back seguro |
+
+## 👨‍💻 Desenvolvedor
+
+Projeto desenvolvido por **Alex Pablo de Oliveira Moraes** — estudante de **Sistemas de Informação** na **UNEMAT**.
+
+- 💼 GitHub: [@AlexPablo-hub](https://github.com/AlexPablo-hub)
+- 📫 Dúvidas, sugestões ou feedback sobre o projeto são muito bem-vindos!
+
+> Se este projeto te ajudou de alguma forma, deixe uma ⭐ no repositório — isso me motiva a continuar evoluindo.

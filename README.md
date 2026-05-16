@@ -1,20 +1,22 @@
-## Informações do Sistema
+# NOIR LUXE
 
-### Links
+Um mini e-commerce que eu montei em alguns fins de semana pra brincar com a stack que eu vinha querendo testar há um tempo: **React 18 + TypeScript strict + Tailwind 4 + Zustand 5 + Framer Motion 12**, com **Vitest** e **Playwright** em cima.
 
-- 🚀 **Aplicação publicada**: <https://noirlux-ecommerce.vercel.app>
+A premissa foi simples: pegar a [Fakestore API](https://fakestoreapi.com) (que é read-only e meio limitada) e tentar fazer ela parecer uma loja "viva" — com painel admin que cria/edita produtos, loja do cliente que reflete tudo em outra aba sem refresh, carrinho, favoritos, checkout e comprovante imprimível. O nome "NOIR LUXE" veio da identidade visual que acabou saindo no Figma: violeta + preto + serifa.
+
+## Links
+
+- 🚀 **App publicado**: <https://noirlux-ecommerce.vercel.app>
 - 🎨 **Protótipo no Figma**: <https://www.figma.com/community/file/1630765064447318545>
 
-**Contas para testar** (definidas no escopo):
+**Contas pra testar** (são contas reais da Fakestore — escolhi duas que dão pra distinguir admin e cliente):
 
-- Admin → `mor_2314` / `83r5^_` → redireciona para `/admin/estoque`
-- Cliente → `kevinryan` / `kev02937@` → redireciona para `/products`
+- Admin → `mor_2314` / `83r5^_` → cai em `/admin/estoque`
+- Cliente → `kevinryan` / `kev02937@` → cai em `/products`
 
-## ✨ Extras além do solicitado
+## Funcionalidades
 
-O escopo inicial cobria o básico (auth, CRUD admin, listagem + carrinho + checkout do cliente) e 4 diferenciais técnicos (Vitest, Zustand, Figma, tratamento de erros). Tudo entregue. Acima disso, foram acrescentados estes recursos por iniciativa:
-
-| Extra | O que faz | Onde |
+| Feature | O que faz | Onde |
 |---|---|---|
 | ❤️ **Favoritos** | Wishlist completa (toggle no card, drawer próprio, mover ao carrinho), persistente e sincronizada entre abas | [favoritesStore](src/stores/favoritesStore.ts) + [FavoritesDrawer](src/components/favorites/FavoritesDrawer.tsx) |
 | 🔁 **Cross-tab sync** | Criar/editar/excluir em uma aba (admin) reflete em ~50ms em outra aba (loja) sem refresh, via evento `storage` do browser | [useCrossTabSync](src/hooks/useCrossTabSync.ts) |
@@ -24,7 +26,7 @@ O escopo inicial cobria o básico (auth, CRUD admin, listagem + carrinho + check
 | 🔄 **F5 sobrevive em /checkout/sucesso** | Pedido salvo em `sessionStorage` antes do redirect; página lê do `location.state` ou cai no storage | [CheckoutPage](src/pages/client/CheckoutPage.tsx) |
 | 🎨 **Galeria de imagens no admin** | Modal secundário com grid de URLs únicas extraídas dos produtos atuais, contornando a limitação da Fakestore (não tem upload) | [AdminProductsPage](src/pages/admin/AdminProductsPage.tsx) |
 | 📱 **Máscaras BR** | Telefone (`+55 XX XXXXX-XXXX`, descarta US), CEP (`XX.XXX-XXX`), moeda (`R$ 1.500,00`) — todas progressivas e idempotentes | [lib/format.ts](src/lib/format.ts) |
-| 🚀 **App publicado** | Deploy automático na Vercel via push pra `master` + SPA fallback explícito (`vercel.json`) | <https://noirlux-ecommerce.vercel.app> |
+| 🚀 **Deploy automático** | Vercel via push pra `master` + SPA fallback explícito (`vercel.json`) | <https://noirlux-ecommerce.vercel.app> |
 | 🎯 **404 estilizada** | Página dedicada com identidade NOIR LUXE, 404 gigante com glow violeta animado | [NotFoundPage](src/pages/NotFoundPage.tsx) |
 | 🪟 **Header dinâmico** | Em `/checkout/sucesso` o header global vira *minimal* (só wordmark central) pra não tentar o usuário a sair do comprovante | [Header](src/components/layout/Header.tsx) |
 | 🌐 **"Ver na loja" no admin** | Botão `<a target="_blank">` aproveita a hierarquia admin → client; admin abre a loja em nova aba sem refazer login | [AdminProductsPage](src/pages/admin/AdminProductsPage.tsx) |
@@ -33,7 +35,7 @@ O escopo inicial cobria o básico (auth, CRUD admin, listagem + carrinho + check
 | 🎭 **Document title dinâmico** | `<title>` muda por rota (admin pages, login, e por categoria em /products) | [useDocumentTitle](src/hooks/useDocumentTitle.ts) |
 | 🍞 **Sistema de toast NOIR LUXE** | 4 variantes (success/error/info/warning) com auto-dismiss e store próprio | [toastStore](src/stores/toastStore.ts) |
 
-## Como baixar, instalar e rodar
+## Como rodar localmente
 
 Pré-requisitos: **Node.js 18+** e **npm**.
 
@@ -41,6 +43,7 @@ Pré-requisitos: **Node.js 18+** e **npm**.
 git clone https://github.com/AlexPablo-hub/noirlux-ecommerce
 cd noirlux-ecommerce
 npm install
+npm run dev
 ```
 
 Scripts disponíveis (em `package.json`):
@@ -122,7 +125,7 @@ src/
 └── types/                // user.ts, product.ts, cart.ts (+ helpers stockStatus, formatSku)
 ```
 
-## Stack utilizada
+## Stack
 
 - **React 18 + TypeScript strict** — base do projeto, sem `any` no código de aplicação
 - **Vite 5** — bundler/dev server
@@ -133,19 +136,20 @@ src/
 - **Axios** — instance com interceptor que mapeia `AxiosError` para classes tipadas (`ApiError`, `NetworkError`, `AuthError`, `ValidationError`)
 - **Lucide React** — ícones
 - **Vitest + Testing Library + MSW + jsdom** — **147 testes** (unit, services, stores, páginas admin e cliente) com mock HTTP em camada de rede
-- **TypeScript strict** — `tsc -b` no build, sem `any` no app
 
-Decisões transversais:
+## Decisões transversais
 
-- **Hidratação uma vez por sessão** — após o primeiro `GET` da Fakestore, alterações locais (criar/editar/excluir) **não são apagadas** em refreshes do browser. Só o `logout` reseta os stores.
+Algumas decisões que afetam o app inteiro e que vale registrar:
+
+- **Hidratação uma vez por sessão** — depois do primeiro `GET` da Fakestore, alterações locais (criar/editar/excluir) **não são apagadas** em refreshes do browser. Só o `logout` reseta os stores.
 - **Merge na hidratação** (apenas `users`) — usuários locais cuja `username` não vem da API são preservados, evitando que CRUDs sumam (a Fakestore retorna `id` mas não persiste de fato).
 - **Cross-tab sync** ([useCrossTabSync](src/hooks/useCrossTabSync.ts)) — `window` ouve o evento `storage` e re-hidrata os stores das outras abas. Criar produto no admin reflete na loja em ~50ms sem refresh.
-- **URL como fonte de verdade de filtros do cliente** — `/products?categoria=eletronicos&ordenar=menor-preco` permite bookmark, share e back/forward do browser.
+- **URL como fonte de verdade dos filtros do cliente** — `/products?categoria=eletronicos&ordenar=menor-preco` permite bookmark, share e back/forward do browser.
 - **Refresh manual** (botão "Atualizar") — força um refetch e mostra `Skeleton` enquanto a request voa.
 - **Tratamento de erros** — `ErrorBoundary` global + classes tipadas + toasts diferenciados por tipo de erro.
 - **Header dinâmico por rota** — em `/checkout/sucesso` o header global vira *minimal* (apenas wordmark central), removendo carrinho/favoritos/usuário pra não tentar o usuário a sair do comprovante.
 
-## Tecnologias e ferramentas por página
+## Como cada página foi montada
 
 ### `/login` — [src/pages/LoginPage.tsx](src/pages/LoginPage.tsx)
 
@@ -312,11 +316,11 @@ Comprovante do pedido — também imprimível.
 | Mover ao carrinho | Botão dedicado no drawer dispara `cartStore.add(product, 1)` + toast |
 | Testes | 5 unit + 3 specs E2E |
 
-## Sobre a responsividade das tabelas no admin
+## Por que as tabelas do admin rolam horizontalmente em mobile
 
 As páginas administrativas (`/admin/clientes` e `/admin/estoque`) usam **rolagem horizontal** (`overflow-x-auto` + `min-w-[680px]/[800px]`) em telas pequenas, em vez de transformar a tabela em cards verticais empilhados como acontece nas páginas voltadas para o cliente.
 
-Essa decisão é deliberada e segue 3 razões:
+Foi uma escolha deliberada, por 3 motivos:
 
 1. **Densidade de informação > legibilidade casual.** O painel admin existe pra comparar muitas linhas em um único campo de visão (preços, estoques, papéis). Quando a tabela vira card vertical em mobile, cada produto ocupa a tela inteira e o admin perde a capacidade de comparar 8 itens de uma vez — que é exatamente o motivo da existência da tela.
 
@@ -326,11 +330,9 @@ Essa decisão é deliberada e segue 3 razões:
 
 A toolbar acima da tabela (busca, filtros, atualizar) **é** totalmente responsiva (`flex-col sm:flex-row`), assim como modais, headers e o sidebar. A rolagem horizontal afeta apenas o `<table>` propriamente, e ela tem indicador visual (a barra de rolagem nativa do browser) deixando claro que há mais conteúdo lateral.
 
-Trade-off consciente: cumpre 100% do requisito de "layout responsivo" para fluxos de cliente (que é o caso de uso mobile real do mini e-commerce) e prioriza usabilidade real de admin em desktop/tablet.
+## Como simular uma "loja viva" com uma API read-only
 
-## Como o admin valida o fluxo end-to-end
-
-A Fakestore API é read-only — `POST /products` retorna id falso e descarta o payload. Mesmo assim, o app simula uma loja "viva":
+A Fakestore API é read-only — `POST /products` retorna id falso e descarta o payload. Mesmo assim, dá pra fazer o app simular uma loja "viva":
 
 1. **Aba A**: abrir `/admin/estoque` e clicar em **"Ver na loja"** no header — abre `/products` em **outra aba** mantendo a sessão (`<a target="_blank">`)
 2. **Aba A**: criar um produto novo (use a galeria pra escolher uma imagem)
@@ -339,7 +341,7 @@ A Fakestore API é read-only — `POST /products` retorna id falso e descarta o 
 
 A combinação que torna isso possível: **Zustand `persist`** escreve em `localStorage` → **`useCrossTabSync`** ouve `storage event` e re-hidrata as outras abas → **`useHydrateProducts`** roda só uma vez por sessão pra não sobrescrever criados locais. Detalhes em cada hook/store linkado acima.
 
-> **Limitações conscientes da Fakestore mock**: produtos criados localmente sobrevivem a refresh mas **não a logout** (reset). Edições em produtos da API são preservadas até o admin clicar em **"Atualizar"** (refetch manual sobrescreve aqueles ids — produtos puramente locais com id alto não são afetados).
+> **Limitações conscientes do mock**: produtos criados localmente sobrevivem a refresh mas **não a logout** (reset). Edições em produtos da API são preservadas até o admin clicar em **"Atualizar"** (refetch manual sobrescreve aqueles ids — produtos puramente locais com id alto não são afetados).
 
 ## Mapa de testes
 
